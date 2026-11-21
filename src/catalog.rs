@@ -835,14 +835,44 @@ fn to_slash(root: &Path, full: &Path) -> String {
 
 /// Loads from pre-baked `static_catalog.json` if valid, otherwise scans `root/tools` and persists it.
 pub fn load(root: &Path) -> io::Result<Catalog> {
-    if let Ok(cat) = load_from_static_file(root) {
-        if cat.total_tools() > 0 {
-            return Ok(cat);
+    if !tools_changed_since_static(root) {
+        if let Ok(cat) = load_from_static_file(root) {
+            if cat.total_tools() > 0 {
+                return Ok(cat);
+            }
         }
     }
     let cat = scan_and_build(root)?;
     let _ = save_static_file(root, &cat);
     Ok(cat)
+}
+
+/// Returns true if `tools/` or any category folder (including ones not in
+/// `CATEGORY_DEFS`) was modified after `static_catalog.json` was written,
+/// i.e. a tool folder was added, removed or renamed. Only directory mtimes
+/// are read (about 10 metadata calls), so the check costs well under 1 ms.
+fn tools_changed_since_static(root: &Path) -> bool {
+    let Ok(cache_time) = fs::metadata(root.join(STATIC_CATALOG_FILE_NAME)).and_then(|m| m.modified())
+    else {
+        return true;
+    };
+    let tools_root = root.join("tools");
+    let newer = |p: &Path| {
+        fs::metadata(p)
+            .and_then(|m| m.modified())
+            .map(|t| t > cache_time)
+            .unwrap_or(false)
+    };
+    if newer(&tools_root) {
+        return true;
+    }
+    match fs::read_dir(&tools_root) {
+        Ok(entries) => entries
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .any(|e| newer(&e.path())),
+        Err(_) => false,
+    }
 }
 
 pub fn load_from_static_file(root: &Path) -> io::Result<Catalog> {
