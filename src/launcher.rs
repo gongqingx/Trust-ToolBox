@@ -77,6 +77,7 @@ struct TrackedProcessInner {
     job: Option<JobGuard>,
 }
 
+#[allow(dead_code)]
 impl TrackedProcessInner {
     fn snapshot(&self) -> TrackedProcessSnapshot {
         TrackedProcessSnapshot {
@@ -109,6 +110,7 @@ impl Default for ProcessTracker {
     }
 }
 
+#[allow(dead_code)]
 impl ProcessTracker {
     pub fn new() -> Self {
         Self {

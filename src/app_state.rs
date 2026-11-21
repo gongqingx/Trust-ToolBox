@@ -29,7 +29,6 @@ pub enum ActiveView {
 pub enum FocusPanel {
     Sidebar = 0,
     Main = 1,
-    Processes = 2,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +45,6 @@ pub enum ScrollTarget {
     MainList,
     Hardware,
     Detail,
-    Processes,
     Help,
     Variants,
 }
@@ -57,7 +55,6 @@ pub enum HitAction {
     ClearSearch,
     OpenPinnedView,
     TogglePreview,
-    ToggleFooter,
     OpenHelp,
     FocusPanel(FocusPanel),
     SelectSidebar(usize),
@@ -72,11 +69,6 @@ pub enum HitAction {
     OpenToolDir,
     TogglePin,
     CopyPassword,
-    SelectProcess(usize),
-    KillSelectedProcess,
-    KillAllProcesses,
-    ClearExitedProcesses,
-    JumpPinnedSlot(usize),
     CloseModal,
     SelectVariant(usize),
     LaunchVariant(usize, bool),
@@ -115,7 +107,6 @@ pub struct UiEffects {
     pub repaint: bool,
     pub activity: bool,
     pub toast_timer: bool,
-    pub proc_timer: bool,
     pub set_fullscreen: Option<bool>,
     pub trim_now: bool,
     pub quit: bool,
@@ -240,7 +231,6 @@ pub struct AppState {
     pub search_focused: bool,
     pub search_query: String,
     pub selected_tool_idx: usize,
-    pub selected_proc_idx: usize,
     pub selected_variant_idx: usize,
 
     pub active_modal: ActiveModal,
@@ -257,7 +247,6 @@ pub struct AppState {
     pub scroll_list: f32,
     pub scroll_hw: f32,
     pub scroll_detail: f32,
-    pub scroll_proc: f32,
     pub scroll_help: f32,
     pub scroll_variants: f32,
 
@@ -304,7 +293,6 @@ impl AppState {
             search_focused: false,
             search_query: String::new(),
             selected_tool_idx: 0,
-            selected_proc_idx: 0,
             selected_variant_idx: 0,
             active_modal: ActiveModal::None,
             screen_pattern_idx: 0,
@@ -318,7 +306,6 @@ impl AppState {
             scroll_list: 0.0,
             scroll_hw: 0.0,
             scroll_detail: 0.0,
-            scroll_proc: 0.0,
             scroll_help: 0.0,
             scroll_variants: 0.0,
             hovered_action: None,
@@ -336,7 +323,6 @@ impl AppState {
             ScrollTarget::MainList => &mut self.scroll_list,
             ScrollTarget::Hardware => &mut self.scroll_hw,
             ScrollTarget::Detail => &mut self.scroll_detail,
-            ScrollTarget::Processes => &mut self.scroll_proc,
             ScrollTarget::Help => &mut self.scroll_help,
             ScrollTarget::Variants => &mut self.scroll_variants,
         }
@@ -853,8 +839,8 @@ impl AppState {
         let Some(vp) = self.last_frame.list_viewport_rect else {
             return;
         };
-        let row_step = (44.0 * logical_scale).round();
-        let expanded_h = (64.0 * logical_scale).round();
+        let row_step = (49.0 * logical_scale).round();
+        let expanded_h = (68.0 * logical_scale).round();
         let top = self.selected_tool_idx as f32 * row_step;
         let bottom = top + expanded_h;
         let vp_h = vp.h.max(1) as f32;
@@ -984,8 +970,6 @@ impl AppState {
                 } else {
                     self.set_toast(format!("已打开: {}", tool.name), fx);
                 }
-                self.tracker.refresh();
-                fx.proc_timer = true;
                 fx.repaint = true;
             }
             Err(e) => {
@@ -1108,40 +1092,6 @@ impl AppState {
         self.set_toast(format!("排序方式已切换为: {lbl}"), fx);
     }
 
-    pub fn jump_pinned_slot(&mut self, slot: usize, scale: f32, fx: &mut UiEffects) {
-        if let Some(id) = self.cfg.pinned.get(slot).cloned() {
-            if let Some(tool) = self.cat.get(&id).cloned() {
-                self.search_query.clear();
-                self.search_focused = false;
-                self.active_view = ActiveView::Category;
-                self.active_category = tool.category_id.clone();
-                self.focus_panel = FocusPanel::Main;
-                self.recompute_tools();
-                if let Some(pos) = self
-                    .cached_tools
-                    .iter()
-                    .position(|&t_idx| self.cat.get_by_idx(t_idx).is_some_and(|t| t.id == id))
-                {
-                    self.selected_tool_idx = pos;
-                }
-                self.prefetch_visible_icons();
-                self.ensure_selected_tool_visible(scale);
-                self.request_preview_for_selected();
-                self.set_toast(format!("已定位收藏 #{}: {}", slot + 1, tool.name), fx);
-            }
-        }
-    }
-
-    pub fn launch_pinned_slot(&mut self, slot: usize, fx: &mut UiEffects) {
-        if let Some(id) = self.cfg.pinned.get(slot).cloned() {
-            if let Some(tool) = self.cat.get(&id).cloned() {
-                let ep = tool.entry_path.clone();
-                let kind = tool.kind.clone();
-                self.launch_tool_variant(&tool, &ep, &kind, false, fx);
-            }
-        }
-    }
-
     pub fn reload_hwinfo(&mut self, fx: &mut UiEffects) {
         match parse_hwinfo(&self.data_root) {
             Ok(rep) => {
@@ -1189,7 +1139,7 @@ impl AppState {
         fx.activity = true;
     }
 
-    pub fn execute_hit(&mut self, action: HitAction, scale: f32, is_dblclk: bool, fx: &mut UiEffects) {
+    pub fn execute_hit(&mut self, action: HitAction, is_dblclk: bool, fx: &mut UiEffects) {
         match action {
             HitAction::FocusSearch => self.prepare_search(fx),
             HitAction::ClearSearch => self.clear_search(true, fx),
@@ -1207,12 +1157,6 @@ impl AppState {
             }
             HitAction::TogglePreview => {
                 self.cfg.show_preview = !self.cfg.show_preview;
-                let _ = self.cfg.save(&self.config_dir);
-                fx.repaint = true;
-                fx.activity = true;
-            }
-            HitAction::ToggleFooter => {
-                self.cfg.show_footer = !self.cfg.show_footer;
                 let _ = self.cfg.save(&self.config_dir);
                 fx.repaint = true;
                 fx.activity = true;
@@ -1271,40 +1215,6 @@ impl AppState {
             HitAction::OpenToolDir => self.open_tool_dir(fx),
             HitAction::TogglePin => self.toggle_pin(fx),
             HitAction::CopyPassword => self.copy_password(fx),
-            HitAction::SelectProcess(i) => {
-                self.focus_panel = FocusPanel::Processes;
-                self.search_focused = false;
-                self.selected_proc_idx = i;
-                fx.repaint = true;
-                fx.activity = true;
-            }
-            HitAction::KillSelectedProcess => {
-                let snap = self.tracker.snapshot();
-                if let Some(p) = snap.get(self.selected_proc_idx) {
-                    match self.tracker.kill(p.pid) {
-                        Ok(()) => self.set_toast(format!("已结束进程 {} (PID {})", p.tool_name, p.pid), fx),
-                        Err(e) => self.set_toast(format!("无法结束: {e}"), fx),
-                    }
-                    fx.activity = true;
-                }
-            }
-            HitAction::KillAllProcesses => {
-                let cnt = self.tracker.kill_all();
-                self.set_toast(format!("已结束 {cnt} 个运行中的工具进程"), fx);
-                fx.activity = true;
-            }
-            HitAction::ClearExitedProcesses => {
-                let removed = self.tracker.clear_exited();
-                self.set_toast(format!("已清理 {removed} 条已结束记录"), fx);
-                fx.activity = true;
-            }
-            HitAction::JumpPinnedSlot(slot) => {
-                if is_dblclk {
-                    self.launch_pinned_slot(slot, fx);
-                } else {
-                    self.jump_pinned_slot(slot, scale, fx);
-                }
-            }
             HitAction::CloseModal | HitAction::ModalBackdrop => self.close_modal(fx),
             HitAction::SelectVariant(idx) => {
                 self.selected_variant_idx = idx;

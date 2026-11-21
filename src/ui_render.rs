@@ -5,7 +5,6 @@ use crate::app_state::{
 use crate::catalog::{Tool, format_bytes};
 use crate::gdi::{Canvas, Rect, Rgb, TextAlign, theme};
 use crate::icons::IconCache;
-use crate::launcher::TrackedProcessSnapshot;
 
 struct Ui<'a, 'b> {
     c: &'a mut Canvas<'b>,
@@ -243,13 +242,8 @@ pub fn render_app(
 
     let pad = ui.dp(10.0);
     let gap = ui.dp(10.0);
-    let top_h = ui.dp(48.0);
-    let status_h = ui.dp(28.0);
-    let footer_h = if state.cfg.show_footer {
-        ui.dp(140.0)
-    } else {
-        0
-    };
+    let top_h = ui.dp(50.0);
+    let status_h = ui.dp(30.0);
 
     // 1. Top Command Bar
     let top_r = Rect::new(pad, pad, (w - pad * 2).max(1), top_h);
@@ -259,22 +253,15 @@ pub fn render_app(
     let status_r = Rect::new(pad, h - pad - status_h, (w - pad * 2).max(1), status_h);
     render_statusbar(&mut ui, state, status_r);
 
-    // 3. Footer Dock
-    let mut work_bottom = status_r.y - ui.dp(6.0);
-    if state.cfg.show_footer {
-        let foot_r = Rect::new(pad, work_bottom - footer_h, (w - pad * 2).max(1), footer_h);
-        render_footer_dock(&mut ui, state, foot_r);
-        work_bottom = foot_r.y - ui.dp(8.0);
-    }
-
-    // 4. Main Workspace row (Sidebar | Center Main Panel | Detail Panel)
+    // 3. Main Workspace row (Sidebar | Center Main Panel | Detail Panel)
+    let work_bottom = status_r.y - ui.dp(8.0);
     let ws_y = top_r.bottom() + gap;
     let ws_h = (work_bottom - ws_y).max(ui.dp(140.0));
-    let sidebar_w = ui.dp(210.0);
+    let sidebar_w = ui.dp(224.0);
     let sidebar_r = Rect::new(pad, ws_y, sidebar_w, ws_h);
 
     let show_detail = state.cfg.show_preview && w >= ui.dp(760.0);
-    let detail_w = if show_detail { ui.dp(330.0) } else { 0 };
+    let detail_w = if show_detail { ui.dp(336.0) } else { 0 };
     let center_x = sidebar_r.right() + gap;
     let center_w = (w - pad - center_x - if show_detail { detail_w + gap } else { 0 }).max(ui.dp(220.0));
     let center_r = Rect::new(center_x, ws_y, center_w, ws_h);
@@ -295,7 +282,7 @@ pub fn render_app(
         }
     }
 
-    // 5. Overlays
+    // 4. Overlays
     match state.active_modal {
         ActiveModal::Help => render_help_modal(&mut ui, state, w, h),
         ActiveModal::Variants => render_variants_modal(&mut ui, state, w, h),
@@ -414,34 +401,6 @@ fn render_topbar(ui: &mut Ui, state: &AppState, r: Rect) {
     );
     rx -= ui.dp(6.0);
 
-    // `底栏` toggle
-    let foot_w = ui.measure_button_w(Some("terminal"), "底栏", state.cfg.show_footer);
-    rx -= foot_w;
-    ui.draw_button(
-        Rect::new(rx, by, foot_w, btn_h),
-        Some("terminal"),
-        "底栏",
-        if state.cfg.show_footer {
-            theme::ACCENT
-        } else {
-            theme::TEXT_MUTED
-        },
-        if state.cfg.show_footer {
-            theme::CARD_SELECTED
-        } else {
-            theme::CARD_BG
-        },
-        theme::CARD_HOVER,
-        if state.cfg.show_footer {
-            theme::BORDER_SOFT_SEL
-        } else {
-            theme::BORDER_DIM
-        },
-        state.cfg.show_footer,
-        HitAction::ToggleFooter,
-    );
-    rx -= ui.dp(6.0);
-
     // `详情` toggle
     let det_w = ui.measure_button_w(Some("panel"), "详情", state.cfg.show_preview);
     rx -= det_w;
@@ -467,57 +426,6 @@ fn render_topbar(ui: &mut Ui, state: &AppState, r: Rect) {
         },
         state.cfg.show_preview,
         HitAction::TogglePreview,
-    );
-    rx -= ui.dp(6.0);
-
-    // Running count badge
-    let snap = state.tracker.snapshot();
-    let run_cnt = snap.iter().filter(|p| p.running).count();
-    let run_txt = format!("{run_cnt}");
-    let run_tw = ui.c.measure_text_width(ui.c.fonts.bold_11, &run_txt);
-    let run_w = run_tw + ui.dp(24.0);
-    rx -= run_w;
-    let run_r = Rect::new(rx, inner.y + (inner.h - ui.dp(26.0)) / 2, run_w, ui.dp(26.0));
-    ui.c.fill_round_rect(
-        run_r,
-        ui.dpf(6.0),
-        Some(if run_cnt > 0 {
-            theme::GREEN_BG
-        } else {
-            theme::CARD_BG
-        }),
-        1.0,
-        if run_cnt > 0 {
-            Rgb::hex(0xA7F3D0)
-        } else {
-            theme::BORDER_DIM
-        },
-    );
-    ui.c.draw_circle(
-        (run_r.x + ui.dp(10.0)) as f32,
-        (run_r.y + run_r.h / 2) as f32,
-        ui.dpf(3.0),
-        if run_cnt > 0 {
-            theme::GREEN_FG
-        } else {
-            theme::TEXT_MUTED
-        },
-    );
-    ui.c.draw_text_single(
-        ui.c.fonts.bold_11,
-        &run_txt,
-        Rect::new(
-            run_r.x + ui.dp(15.0),
-            run_r.y,
-            run_r.w - ui.dp(18.0),
-            run_r.h,
-        ),
-        if run_cnt > 0 {
-            theme::GREEN_FG
-        } else {
-            theme::TEXT_MUTED
-        },
-        TextAlign::Center,
     );
     rx -= ui.dp(6.0);
 
@@ -672,12 +580,12 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
         Some(HitAction::FocusPanel(FocusPanel::Sidebar)),
     );
 
-    let pad = ui.dp(10.0);
+    let pad = ui.dp(12.0);
     let inner = r.inset(pad, pad);
 
     // Header row
-    let hdr_h = ui.dp(20.0);
-    let gsz = ui.dp(13.0);
+    let hdr_h = ui.dp(26.0);
+    let gsz = ui.dp(16.0);
     ui.c.draw_ui_icon(
         "grid",
         inner.x + ui.dp(4.0),
@@ -686,44 +594,51 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
         theme::ACCENT,
     );
     ui.c.draw_text_single(
-        ui.c.fonts.bold_12,
+        ui.c.fonts.bold_13,
         "导航",
-        Rect::new(inner.x + ui.dp(23.0), inner.y, inner.w - ui.dp(24.0), hdr_h),
+        Rect::new(inner.x + ui.dp(26.0), inner.y, inner.w - ui.dp(28.0), hdr_h),
         theme::TEXT_PRIMARY,
         TextAlign::Left,
     );
 
     let list_r = Rect::new(
         inner.x,
-        inner.y + hdr_h + ui.dp(4.0),
+        inner.y + hdr_h + ui.dp(6.0),
         inner.w,
-        (inner.bottom() - (inner.y + hdr_h + ui.dp(4.0))).max(20),
+        (inner.bottom() - (inner.y + hdr_h + ui.dp(6.0))).max(20),
     );
     let entries = state.build_sidebar_entries();
     let header_cnt = entries.iter().filter(|e| e.is_header).count() as i32;
     let btn_cnt = entries.iter().filter(|e| !e.is_header).count() as i32;
-    let gap = ui.dp(2.0);
-    let header_h = ui.dp(18.0);
-    let min_btn_h = ui.dp(24.0);
-    let total_gaps = ((entries.len() as i32) - 1).max(0) * gap;
+    let gap = ui.dp(4.0);
+    let header_h = ui.dp(24.0);
+    let extra_hdr_gap = if header_cnt > 1 {
+        ui.dp(6.0) * (header_cnt - 1)
+    } else {
+        0
+    };
+    let total_gaps = ((entries.len() as i32) - 1).max(0) * gap + extra_hdr_gap;
     let avail_for_btns = (list_r.h - header_cnt * header_h - total_gaps).max(0);
     let btn_h = if btn_cnt > 0 {
-        (avail_for_btns / btn_cnt).max(min_btn_h)
+        (avail_for_btns / btn_cnt).clamp(ui.dp(34.0), ui.dp(42.0))
     } else {
-        min_btn_h
+        ui.dp(38.0)
     };
     let content_h = header_cnt * header_h + btn_cnt * btn_h + total_gaps;
 
     ui.c.push_clip(list_r);
     let mut sy = list_r.y - state.scroll_sidebar.round() as i32;
     for (idx, item) in entries.iter().enumerate() {
+        if item.is_header && idx > 0 {
+            sy += ui.dp(6.0);
+        }
         let item_h = if item.is_header { header_h } else { btn_h };
         let ir = Rect::new(list_r.x, sy, list_r.w, item_h);
         if ir.bottom() >= list_r.y && ir.y <= list_r.bottom() {
             if item.is_header {
-                let lw = ui.c.measure_text_width(ui.c.fonts.bold_10, &item.label);
+                let lw = ui.c.measure_text_width(ui.c.fonts.bold_11, &item.label);
                 ui.c.draw_text_single(
-                    ui.c.fonts.bold_10,
+                    ui.c.fonts.bold_11,
                     &item.label,
                     Rect::new(ir.x + ui.dp(4.0), ir.y, lw + ui.dp(4.0), ir.h),
                     theme::TEXT_MUTED,
@@ -754,9 +669,9 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
                     ui.c.fill_round_rect(ir, ui.dpf(7.0), Some(bg), bw, bc);
                 }
                 if item.selected {
-                    let bar_h = ui.dp(14.0).min(ir.h - ui.dp(4.0));
+                    let bar_h = ui.dp(20.0).min(ir.h - ui.dp(8.0));
                     ui.c.fill_round_rect(
-                        Rect::new(ir.x, ir.y + (ir.h - bar_h) / 2, ui.dp(3.0), bar_h),
+                        Rect::new(ir.x, ir.y + (ir.h - bar_h) / 2, ui.dp(3.5).max(3), bar_h),
                         ui.dpf(2.0),
                         Some(if focused {
                             theme::ACCENT
@@ -768,7 +683,7 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
                     );
                 }
 
-                let isz = ui.dp(14.0);
+                let isz = ui.dp(18.0);
                 let icol = if item.selected {
                     theme::ACCENT
                 } else {
@@ -776,29 +691,29 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
                 };
                 ui.c.draw_ui_icon(
                     item.icon_key,
-                    ir.x + ui.dp(10.0),
+                    ir.x + ui.dp(11.0),
                     ir.y + (ir.h - isz) / 2,
                     isz,
                     icol,
                 );
 
                 let cnt_reserve = if item.show_count {
-                    ui.dp(34.0)
+                    ui.dp(38.0)
                 } else {
-                    ui.dp(8.0)
+                    ui.dp(10.0)
                 };
                 let font = if item.selected {
-                    ui.c.fonts.bold_12
+                    ui.c.fonts.bold_13
                 } else {
-                    ui.c.fonts.reg_12
+                    ui.c.fonts.reg_125
                 };
                 ui.c.draw_text_single(
                     font,
                     &item.label,
                     Rect::new(
-                        ir.x + ui.dp(30.0),
+                        ir.x + ui.dp(36.0),
                         ir.y,
-                        (ir.w - ui.dp(30.0) - cnt_reserve).max(16),
+                        (ir.w - ui.dp(36.0) - cnt_reserve).max(16),
                         ir.h,
                     ),
                     if item.selected {
@@ -811,8 +726,8 @@ fn render_sidebar(ui: &mut Ui, state: &mut AppState, r: Rect) {
 
                 if item.show_count {
                     let cs = format!("{}", item.count);
-                    let cw = ui.dp(24.0);
-                    let ch = ui.dp(17.0).min(ir.h - ui.dp(4.0));
+                    let cw = ui.dp(26.0);
+                    let ch = ui.dp(20.0).min(ir.h - ui.dp(6.0));
                     let cr = Rect::new(
                         ir.right() - ui.dp(8.0) - cw,
                         ir.y + (ir.h - ch) / 2,
@@ -999,9 +914,9 @@ fn render_tools_main(ui: &mut Ui, state: &mut AppState, r: Rect) {
         return;
     }
 
-    let row_gap = ui.dp(4.0);
-    let row_normal_h = ui.dp(40.0);
-    let row_sel_h = ui.dp(64.0);
+    let row_gap = ui.dp(5.0);
+    let row_normal_h = ui.dp(44.0);
+    let row_sel_h = ui.dp(68.0);
     let total_h = (state.cached_tools.len().saturating_sub(1) as i32) * (row_normal_h + row_gap) + row_sel_h;
     let bar_pad = if total_h > list_r.h { ui.dp(10.0) } else { 0 };
     let row_w = (list_r.w - bar_pad).max(120);
@@ -1049,7 +964,7 @@ fn render_tools_main(ui: &mut Ui, state: &mut AppState, r: Rect) {
             };
             ui.c.fill_round_rect(rr, ui.dpf(8.0), Some(bg), bw, bc);
 
-            let isz = ui.dp(24.0);
+            let isz = ui.dp(28.0);
             let icon_r = Rect::new(rr.x + ui.dp(10.0), rr.y + (rr.h - isz) / 2, isz, isz);
             ui.draw_tool_icon(&mut state.icon_cache, &tool, icon_r);
 
@@ -1105,7 +1020,7 @@ fn render_tools_main(ui: &mut Ui, state: &mut AppState, r: Rect) {
 
             if sel {
                 let mut nx = name_x;
-                let top_y = rr.y + ui.dp(9.0);
+                let top_y = rr.y + ui.dp(11.0);
                 let line_h = ui.dp(20.0);
                 if pinned {
                     let ssz = ui.dp(12.0);
@@ -1122,7 +1037,7 @@ fn render_tools_main(ui: &mut Ui, state: &mut AppState, r: Rect) {
                 ui.c.draw_text_single(
                     ui.c.fonts.reg_11,
                     &tool.description,
-                    Rect::new(name_x, top_y + ui.dp(22.0), text_w, ui.dp(18.0)),
+                    Rect::new(name_x, top_y + ui.dp(24.0), text_w, ui.dp(18.0)),
                     theme::TEXT_SECONDARY,
                     TextAlign::Left,
                 );
@@ -1935,279 +1850,6 @@ fn render_tool_detail(ui: &mut Ui, state: &mut AppState, r: Rect) {
     );
 }
 
-fn render_footer_dock(ui: &mut Ui, state: &mut AppState, r: Rect) {
-    let gap = ui.dp(10.0);
-    let w = r.w;
-    let proc_w = ((w as f32 * 0.37).round() as i32).max(ui.dp(240.0));
-    let fav_w = ((w as f32 * 0.27).round() as i32).max(ui.dp(190.0));
-    let hw_w = (w - proc_w - fav_w - gap * 2).max(ui.dp(180.0));
-
-    let proc_r = Rect::new(r.x, r.y, proc_w, r.h);
-    let hw_r = Rect::new(proc_r.right() + gap, r.y, hw_w, r.h);
-    let fav_r = Rect::new(hw_r.right() + gap, r.y, (r.right() - hw_r.right() - gap).max(100), r.h);
-
-    // 1. Process Monitor
-    let pfocused = state.focus_panel == FocusPanel::Processes && !state.search_focused;
-    ui.draw_panel(
-        proc_r,
-        pfocused,
-        theme::SURFACE_BG,
-        Some(HitAction::FocusPanel(FocusPanel::Processes)),
-    );
-    let pinr = proc_r.inset(ui.dp(12.0), ui.dp(10.0));
-    let snap: Vec<TrackedProcessSnapshot> = state.tracker.snapshot();
-    let run_cnt = snap.iter().filter(|p| p.running).count();
-
-    let hdr_h = ui.dp(24.0);
-    ui.c.draw_ui_icon(
-        "terminal",
-        pinr.x,
-        pinr.y + (hdr_h - ui.dp(13.0)) / 2,
-        ui.dp(13.0),
-        theme::ACCENT,
-    );
-    ui.c.draw_text_single(
-        ui.c.fonts.bold_12,
-        "进程监控",
-        Rect::new(pinr.x + ui.dp(19.0), pinr.y, ui.dp(60.0), hdr_h),
-        theme::TEXT_PRIMARY,
-        TextAlign::Left,
-    );
-    let rtxt = format!("{run_cnt} 运行");
-    let rbw = ui.measure_badge_w(&rtxt, false);
-    ui.draw_badge(
-        Rect::new(pinr.x + ui.dp(80.0), pinr.y + ui.dp(2.0), rbw, ui.dp(20.0)),
-        &rtxt,
-        if run_cnt > 0 { theme::GREEN_FG } else { theme::TEXT_MUTED },
-        if run_cnt > 0 { theme::GREEN_BG } else { theme::PILL_BG },
-        true,
-    );
-
-    let mut bx = pinr.right();
-    for (lbl, act) in [
-        ("清理", HitAction::ClearExitedProcesses),
-        ("全关", HitAction::KillAllProcesses),
-        ("结束", HitAction::KillSelectedProcess),
-    ] {
-        let bw = ui.measure_button_w(None, lbl, false);
-        bx -= bw;
-        ui.draw_button(
-            Rect::new(bx, pinr.y + 1, bw, ui.dp(22.0)),
-            None,
-            lbl,
-            theme::TEXT_SLATE,
-            theme::SURFACE_BG,
-            theme::CARD_HOVER,
-            theme::BORDER_DIM,
-            false,
-            act,
-        );
-        bx -= ui.dp(4.0);
-    }
-
-    let list_r = Rect::new(
-        pinr.x,
-        pinr.y + hdr_h + ui.dp(8.0),
-        pinr.w,
-        (pinr.bottom() - (pinr.y + hdr_h + ui.dp(8.0))).max(16),
-    );
-    if snap.is_empty() {
-        ui.c.draw_text_single(
-            ui.c.fonts.reg_11,
-            "尚无已启动工具进程",
-            Rect::new(list_r.x, list_r.y + ui.dp(12.0), list_r.w, ui.dp(18.0)),
-            theme::TEXT_MUTED,
-            TextAlign::Left,
-        );
-        ui.c.draw_text_single(
-            ui.c.fonts.reg_11,
-            "选中工具双击或按 Enter 启动 · x 结束 / X 全关",
-            Rect::new(list_r.x, list_r.y + ui.dp(34.0), list_r.w, ui.dp(18.0)),
-            theme::TEXT_SECONDARY,
-            TextAlign::Left,
-        );
-    } else {
-        let row_h = ui.dp(22.0);
-        let row_gap = ui.dp(2.0);
-        let total_h = snap.len() as i32 * (row_h + row_gap);
-        ui.c.push_clip(list_r);
-        let mut py = list_r.y - state.scroll_proc.round() as i32;
-        for (i, p) in snap.iter().enumerate() {
-            let pr = Rect::new(list_r.x, py, list_r.w - ui.dp(10.0), row_h);
-            if pr.bottom() >= list_r.y && pr.y <= list_r.bottom() {
-                let sel = i == state.selected_proc_idx;
-                let act = HitAction::SelectProcess(i);
-                let hov = ui.is_hovered(&act);
-                let (bg, bw, bc) = if sel {
-                    (
-                        theme::CARD_SELECTED,
-                        if pfocused { ui.dpf(1.5) } else { 1.0 },
-                        if pfocused { theme::BORDER_ACTIVE } else { theme::BORDER_SOFT_SEL },
-                    )
-                } else if hov {
-                    (theme::CARD_HOVER, 0.0, theme::CARD_HOVER)
-                } else {
-                    (theme::SURFACE_BG, 0.0, theme::SURFACE_BG)
-                };
-                if sel || hov {
-                    ui.c.fill_round_rect(pr, ui.dpf(5.0), Some(bg), bw, bc);
-                }
-                let dcol = if p.running { theme::GREEN_FG } else { theme::TEXT_MUTED };
-                ui.c.draw_circle((pr.x + ui.dp(8.0)) as f32, (pr.y + row_h / 2) as f32, ui.dpf(3.0), dcol);
-                let st_txt = if p.external {
-                    if p.admin { "提权托管".to_string() } else { "外壳托管".to_string() }
-                } else if p.running {
-                    format!("PID {}", p.pid)
-                } else {
-                    "已退出".to_string()
-                };
-                let sw = ui.dp(66.0);
-                ui.c.draw_text_single(
-                    if sel { ui.c.fonts.bold_11 } else { ui.c.fonts.reg_11 },
-                    &p.tool_name,
-                    Rect::new(pr.x + ui.dp(18.0), pr.y, (pr.w - ui.dp(24.0) - sw).max(20), row_h),
-                    theme::TEXT_PRIMARY,
-                    TextAlign::Left,
-                );
-                ui.c.draw_text_single(
-                    ui.c.fonts.mono_11,
-                    &st_txt,
-                    Rect::new(pr.right() - sw - ui.dp(6.0), pr.y, sw, row_h),
-                    dcol,
-                    TextAlign::Right,
-                );
-                ui.push_hit(pr, act, true);
-            }
-            py += row_h + row_gap;
-        }
-        ui.c.pop_clip();
-        ui.add_scrollbar(ScrollTarget::Processes, list_r, total_h, &mut state.scroll_proc);
-    }
-
-    // 2. Hardware Meta Card
-    ui.draw_panel(hw_r, false, theme::SURFACE_BG, None);
-    let hinr = hw_r.inset(ui.dp(12.0), ui.dp(10.0));
-    ui.c.draw_ui_icon(
-        "dashboard",
-        hinr.x,
-        hinr.y + (hdr_h - ui.dp(13.0)) / 2,
-        ui.dp(13.0),
-        theme::ACCENT,
-    );
-    ui.c.draw_text_single(
-        ui.c.fonts.bold_12,
-        "配置与属性",
-        Rect::new(hinr.x + ui.dp(19.0), hinr.y, ui.dp(90.0), hdr_h),
-        theme::TEXT_PRIMARY,
-        TextAlign::Left,
-    );
-    let sbw = ui.measure_badge_w("STATIC", false);
-    ui.draw_badge(
-        Rect::new(hinr.right() - sbw, hinr.y + ui.dp(2.0), sbw, ui.dp(20.0)),
-        "STATIC",
-        theme::TEXT_MUTED,
-        theme::PILL_BG,
-        false,
-    );
-    let (mcpu, mgpu, m3l, m3v) = state.footer_hw_meta();
-    let mut hy = hinr.y + hdr_h + ui.dp(8.0);
-    for (k, v) in [("CPU:", mcpu), ("GPU:", mgpu), (m3l, m3v)] {
-        ui.c.draw_text_single(
-            ui.c.fonts.bold_11,
-            k,
-            Rect::new(hinr.x, hy, ui.dp(40.0), ui.dp(18.0)),
-            theme::TEXT_MUTED,
-            TextAlign::Left,
-        );
-        ui.c.draw_text_single(
-            ui.c.fonts.reg_11,
-            &v,
-            Rect::new(hinr.x + ui.dp(44.0), hy, (hinr.w - ui.dp(44.0)).max(20), ui.dp(18.0)),
-            theme::TEXT_PRIMARY,
-            TextAlign::Left,
-        );
-        hy += ui.dp(22.0);
-    }
-
-    // 3. Pinned Quick Launch [1-5]
-    ui.draw_panel(fav_r, false, theme::SURFACE_BG, None);
-    let finr = fav_r.inset(ui.dp(12.0), ui.dp(10.0));
-    ui.c.draw_ui_icon(
-        "star",
-        finr.x,
-        finr.y + (hdr_h - ui.dp(13.0)) / 2,
-        ui.dp(13.0),
-        theme::AMBER_FG,
-    );
-    ui.c.draw_text_single(
-        ui.c.fonts.bold_12,
-        "快捷收藏 [1-5]",
-        Rect::new(finr.x + ui.dp(19.0), finr.y, ui.dp(110.0), hdr_h),
-        theme::TEXT_PRIMARY,
-        TextAlign::Left,
-    );
-    let qitems: Vec<(usize, String, String)> = state
-        .cfg
-        .pinned
-        .iter()
-        .filter_map(|id| state.cat.get(id))
-        .take(5)
-        .enumerate()
-        .map(|(i, t)| (i, t.name.clone(), t.category_name.clone()))
-        .collect();
-    let qcnt_txt = format!("{} 项", state.cfg.pinned.len());
-    let qbw = ui.measure_badge_w(&qcnt_txt, false);
-    ui.draw_badge(
-        Rect::new(finr.right() - qbw, finr.y + ui.dp(2.0), qbw, ui.dp(20.0)),
-        &qcnt_txt,
-        theme::AMBER_FG,
-        theme::AMBER_BG,
-        true,
-    );
-
-    let mut fy = finr.y + hdr_h + ui.dp(6.0);
-    let frow_h = ui.dp(18.0);
-    if qitems.is_empty() {
-        ui.c.draw_text_single(
-            ui.c.fonts.reg_11,
-            "按 p 收藏工具 · 1~5 直达",
-            Rect::new(finr.x, fy + ui.dp(16.0), finr.w, ui.dp(18.0)),
-            theme::TEXT_MUTED,
-            TextAlign::Center,
-        );
-    } else {
-        for (slot, name, cat_name) in qitems {
-            if fy + frow_h > finr.bottom() {
-                break;
-            }
-            let fr = Rect::new(finr.x, fy, finr.w, frow_h);
-            let act = HitAction::JumpPinnedSlot(slot);
-            if ui.is_hovered(&act) {
-                ui.c.fill_round_rect(fr, ui.dpf(4.0), Some(theme::CARD_HOVER), 0.0, theme::CARD_HOVER);
-            }
-            let slot_r = Rect::new(fr.x, fr.y + 1, ui.dp(18.0), ui.dp(16.0));
-            ui.draw_badge(slot_r, &format!("{}", slot + 1), theme::ACCENT, theme::ACCENT_SOFT, true);
-            let cw = ui.dp(64.0);
-            ui.c.draw_text_single(
-                ui.c.fonts.reg_11,
-                &name,
-                Rect::new(slot_r.right() + ui.dp(6.0), fr.y, (fr.w - ui.dp(28.0) - cw).max(20), frow_h),
-                theme::TEXT_PRIMARY,
-                TextAlign::Left,
-            );
-            ui.c.draw_text_single(
-                ui.c.fonts.reg_10,
-                &cat_name,
-                Rect::new(fr.right() - cw - ui.dp(4.0), fr.y, cw, frow_h),
-                theme::TEXT_MUTED,
-                TextAlign::Right,
-            );
-            ui.push_hit(fr, act, true);
-            fy += frow_h + ui.dp(2.0);
-        }
-    }
-}
-
 fn render_statusbar(ui: &mut Ui, state: &AppState, r: Rect) {
     let mode_text = if state.active_modal != ActiveModal::None {
         "MODAL"
@@ -2233,7 +1875,6 @@ fn render_statusbar(ui: &mut Ui, state: &AppState, r: Rect) {
         ("Tab", "切焦"),
         ("Enter", "启动"),
         ("/", "搜索"),
-        ("F", "底栏"),
         ("?", "帮助"),
         ("q", "退出"),
     ];
@@ -2330,8 +1971,7 @@ fn render_help_modal(ui: &mut Ui, state: &mut AppState, w: i32, h: i32) {
         ("全局导航", None),
         ("", Some(("j / k / ↑ / ↓", "移动光标或滚动当前面板"))),
         ("", Some(("h / l / ← / →", "在侧边栏、主面板之间切换焦点"))),
-        ("", Some(("Tab / Shift+Tab", "循环切换焦点 (侧边栏 -> 主面板 -> 进程监控)"))),
-        ("", Some(("1 ~ 5", "快速跳转至收藏夹前 5 项常用工具"))),
+        ("", Some(("Tab / Shift+Tab", "在侧边栏与主面板之间切换焦点"))),
         ("", Some(("/  或  Ctrl+F", "聚焦即时搜索框（支持中英文/别名）；Esc 清除"))),
         ("工具操作", None),
         ("", Some(("Enter / 双击", "启动工具 / 看图器打开天梯图 / 全屏坏点检测"))),
@@ -2341,8 +1981,7 @@ fn render_help_modal(ui: &mut Ui, state: &mut AppState, w: i32, h: i32) {
         ("", Some(("p / w", "加入或移出收藏夹 / 复制压缩包解压密码"))),
         ("硬件与视图", None),
         ("", Some(("r / d / e / c", "重读 hwinfo.ini / 图拉丁检测 / 导出TXT / 复制摘要"))),
-        ("", Some(("s / F / P", "切换排序 / 开关底部工作坞 / 开关右侧详情"))),
-        ("", Some(("x / X / c", "进程栏聚焦时：结束选中 / 全部结束 / 清理退出记录"))),
+        ("", Some(("s / P", "切换排序 / 开关右侧详情"))),
     ];
 
     ui.c.push_clip(vp);

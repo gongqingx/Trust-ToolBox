@@ -9,7 +9,6 @@ pub const CONFIG_FILE_NAME: &str = "tui_config.json";
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(default)]
 pub struct Config {
-    pub show_footer: bool,
     pub show_preview: bool,
     pub sort_mode: String,
     pub pinned: Vec<String>,
@@ -19,7 +18,6 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            show_footer: true,
             show_preview: true,
             sort_mode: "default".to_string(),
             pinned: vec![

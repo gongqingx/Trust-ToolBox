@@ -37,7 +37,7 @@ use windows_sys::Win32::UI::HiDpi::{
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
     GetKeyState, ReleaseCapture, SetCapture, SetFocus, TME_LEAVE, TRACKMOUSEEVENT, TrackMouseEvent,
     VK_BACK, VK_CONTROL, VK_DOWN, VK_END, VK_ESCAPE, VK_HOME, VK_LEFT, VK_NEXT, VK_PRIOR,
-    VK_RETURN, VK_RIGHT, VK_SHIFT, VK_SPACE, VK_TAB, VK_UP,
+    VK_RETURN, VK_RIGHT, VK_SPACE, VK_TAB, VK_UP,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CS_DBLCLKS, CS_HREDRAW, CS_VREDRAW, CreateIconIndirect, CreateWindowExW, DefWindowProcW,
@@ -56,7 +56,6 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 const WM_MOUSELEAVE: u32 = 0x02A3;
 const TIMER_TRIM_ID: usize = 1;
 const TIMER_TOAST_ID: usize = 2;
-const TIMER_PROC_ID: usize = 3;
 
 struct DragScroll {
     target: ScrollTarget,
@@ -97,7 +96,6 @@ struct WinHost {
     tracking_mouse: bool,
     pending_high_surrogate: u16,
     drag_scroll: Option<DragScroll>,
-    proc_timer_active: bool,
     trim_timer_armed: bool,
     ime_enabled: bool,
     saved_placement: WINDOWPLACEMENT,
@@ -286,12 +284,6 @@ impl WinHost {
                 SetTimer(self.hwnd, TIMER_TOAST_ID, 4000, None);
             }
         }
-        if fx.proc_timer && !self.proc_timer_active && self.state.tracker.has_running() {
-            self.proc_timer_active = true;
-            unsafe {
-                SetTimer(self.hwnd, TIMER_PROC_ID, 1000, None);
-            }
-        }
         if fx.trim_now {
             self.trim_timer_armed = false;
             self.backbuffer.release();
@@ -438,7 +430,7 @@ impl WinHost {
             }
 
             let mut fx = UiEffects::default();
-            self.state.execute_hit(act, self.scale, is_dblclk, &mut fx);
+            self.state.execute_hit(act, is_dblclk, &mut fx);
             self.apply_effects(fx, ops);
         }
     }
@@ -470,7 +462,6 @@ impl WinHost {
     fn handle_key_down(&mut self, vk: u16, ops: &mut DeferredWinOps) {
         let mut fx = UiEffects::default();
         let ctrl_down = unsafe { GetKeyState(VK_CONTROL as i32) < 0 };
-        let shift_down = unsafe { GetKeyState(VK_SHIFT as i32) < 0 };
 
         if ctrl_down && vk == b'F' as u16 {
             self.state.active_modal = ActiveModal::None;
@@ -525,7 +516,7 @@ impl WinHost {
                     x if x == VK_RETURN => {
                         let idx = self.state.selected_variant_idx;
                         self.state
-                            .execute_hit(HitAction::LaunchVariant(idx, false), self.scale, false, &mut fx);
+                            .execute_hit(HitAction::LaunchVariant(idx, false), false, &mut fx);
                     }
                     _ => {}
                 }
@@ -591,23 +582,9 @@ impl WinHost {
                 }
             }
             x if x == VK_TAB => {
-                let has_footer = self.state.cfg.show_footer;
-                self.state.focus_panel = if shift_down {
-                    match self.state.focus_panel {
-                        FocusPanel::Sidebar => {
-                            if has_footer { FocusPanel::Processes } else { FocusPanel::Main }
-                        }
-                        FocusPanel::Main => FocusPanel::Sidebar,
-                        FocusPanel::Processes => FocusPanel::Main,
-                    }
-                } else {
-                    match self.state.focus_panel {
-                        FocusPanel::Sidebar => FocusPanel::Main,
-                        FocusPanel::Main => {
-                            if has_footer { FocusPanel::Processes } else { FocusPanel::Sidebar }
-                        }
-                        FocusPanel::Processes => FocusPanel::Sidebar,
-                    }
+                self.state.focus_panel = match self.state.focus_panel {
+                    FocusPanel::Sidebar => FocusPanel::Main,
+                    FocusPanel::Main => FocusPanel::Sidebar,
                 };
                 fx.repaint = true;
                 fx.activity = true;
@@ -615,19 +592,10 @@ impl WinHost {
             x if x == VK_DOWN => match self.state.focus_panel {
                 FocusPanel::Sidebar => self.state.move_sidebar(1, &mut fx),
                 FocusPanel::Main => self.state.move_tool(1, self.scale, &mut fx),
-                FocusPanel::Processes => {
-                    let max_i = self.state.tracker.snapshot().len().saturating_sub(1);
-                    self.state.selected_proc_idx = (self.state.selected_proc_idx + 1).min(max_i);
-                    fx.repaint = true;
-                }
             },
             x if x == VK_UP => match self.state.focus_panel {
                 FocusPanel::Sidebar => self.state.move_sidebar(-1, &mut fx),
                 FocusPanel::Main => self.state.move_tool(-1, self.scale, &mut fx),
-                FocusPanel::Processes => {
-                    self.state.selected_proc_idx = self.state.selected_proc_idx.saturating_sub(1);
-                    fx.repaint = true;
-                }
             },
             x if x == VK_NEXT => {
                 if self.state.focus_panel == FocusPanel::Main {
@@ -663,7 +631,6 @@ impl WinHost {
                     fx.repaint = true;
                 }
                 FocusPanel::Main => self.state.launch_selected(false, &mut fx),
-                FocusPanel::Processes => {}
             },
             _ => {}
         }
@@ -711,7 +678,7 @@ impl WinHost {
                     'a' => {
                         let idx = self.state.selected_variant_idx;
                         self.state
-                            .execute_hit(HitAction::LaunchVariant(idx, true), self.scale, false, &mut fx);
+                            .execute_hit(HitAction::LaunchVariant(idx, true), false, &mut fx);
                     }
                     _ => {}
                 }
@@ -749,29 +716,17 @@ impl WinHost {
                 fx.repaint = true;
             }
             'q' => fx.quit = true,
-            'F' => self
-                .state
-                .execute_hit(HitAction::ToggleFooter, self.scale, false, &mut fx),
             'P' => self
                 .state
-                .execute_hit(HitAction::TogglePreview, self.scale, false, &mut fx),
+                .execute_hit(HitAction::TogglePreview, false, &mut fx),
             's' => self.state.cycle_sort(&mut fx),
             'j' => match self.state.focus_panel {
                 FocusPanel::Sidebar => self.state.move_sidebar(1, &mut fx),
                 FocusPanel::Main => self.state.move_tool(1, self.scale, &mut fx),
-                FocusPanel::Processes => {
-                    let max_i = self.state.tracker.snapshot().len().saturating_sub(1);
-                    self.state.selected_proc_idx = (self.state.selected_proc_idx + 1).min(max_i);
-                    fx.repaint = true;
-                }
             },
             'k' => match self.state.focus_panel {
                 FocusPanel::Sidebar => self.state.move_sidebar(-1, &mut fx),
                 FocusPanel::Main => self.state.move_tool(-1, self.scale, &mut fx),
-                FocusPanel::Processes => {
-                    self.state.selected_proc_idx = self.state.selected_proc_idx.saturating_sub(1);
-                    fx.repaint = true;
-                }
             },
             'h' => {
                 self.state.focus_panel = FocusPanel::Sidebar;
@@ -781,38 +736,15 @@ impl WinHost {
                 self.state.focus_panel = FocusPanel::Main;
                 fx.repaint = true;
             }
-            '1'..='5' => {
-                let slot = (c as usize) - ('1' as usize);
-                self.state.jump_pinned_slot(slot, self.scale, &mut fx);
-            }
             'a' => self.state.launch_selected(true, &mut fx),
             'b' => self
                 .state
-                .execute_hit(HitAction::OpenVariants, self.scale, false, &mut fx),
+                .execute_hit(HitAction::OpenVariants, false, &mut fx),
             'o' => self.state.open_tool_dir(&mut fx),
             'p' => self.state.toggle_pin(&mut fx),
             'w' => self.state.copy_password(&mut fx),
-            'x' if self.state.focus_panel == FocusPanel::Processes => self.state.execute_hit(
-                HitAction::KillSelectedProcess,
-                self.scale,
-                false,
-                &mut fx,
-            ),
-            'X' if self.state.focus_panel == FocusPanel::Processes => {
-                self.state
-                    .execute_hit(HitAction::KillAllProcesses, self.scale, false, &mut fx)
-            }
-            'c' => {
-                if self.state.focus_panel == FocusPanel::Processes {
-                    self.state.execute_hit(
-                        HitAction::ClearExitedProcesses,
-                        self.scale,
-                        false,
-                        &mut fx,
-                    );
-                } else if self.state.active_view == app_state::ActiveView::Hardware {
-                    self.state.copy_hwinfo(&mut fx);
-                }
+            'c' if self.state.active_view == app_state::ActiveView::Hardware => {
+                self.state.copy_hwinfo(&mut fx);
             }
             'r' if self.state.active_view == app_state::ActiveView::Hardware => {
                 self.state.reload_hwinfo(&mut fx)
@@ -1041,14 +973,6 @@ unsafe extern "system" fn wnd_proc(
                             InvalidateRect(hwnd, null(), 0);
                         }
                     }
-                    TIMER_PROC_ID => {
-                        host.state.tracker.refresh();
-                        if !host.state.tracker.has_running() {
-                            KillTimer(hwnd, TIMER_PROC_ID);
-                            host.proc_timer_active = false;
-                        }
-                        InvalidateRect(hwnd, null(), 0);
-                    }
                     _ => {}
                 }
                 ops.result = Some(0);
@@ -1056,7 +980,6 @@ unsafe extern "system" fn wnd_proc(
             WM_DESTROY => {
                 KillTimer(hwnd, TIMER_TRIM_ID);
                 KillTimer(hwnd, TIMER_TOAST_ID);
-                KillTimer(hwnd, TIMER_PROC_ID);
                 host.state.hwnd_raw.store(0, Ordering::Release);
                 host.backbuffer.release();
                 host.fonts.clear();
@@ -1331,7 +1254,6 @@ fn main() {
             tracking_mouse: false,
             pending_high_surrogate: 0,
             drag_scroll: None,
-            proc_timer_active: false,
             trim_timer_armed: true,
             ime_enabled: false,
             saved_placement: WINDOWPLACEMENT::default(),
