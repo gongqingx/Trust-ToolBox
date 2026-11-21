@@ -1,0 +1,2131 @@
+{
+  "categories": [
+    {
+      "ID": "overview",
+      "Name": "综合检测",
+      "Folder": "综合检测",
+      "Tools": [
+        {
+          "id": "tulading_hw",
+          "name": "图拉丁硬件检测",
+          "aliases": [
+            "图拉丁硬件检测",
+            "硬件检测",
+            "图吧检测"
+          ],
+          "category_id": "overview",
+          "category_name": "综合检测",
+          "tag": "本土检测",
+          "description": "图吧工具箱内置硬件快速识别工具，可读取 CPU、芯片组、内存 SPD、显卡、硬盘与显示器 EDID。",
+          "warning": "内含 WinRing0 底层硬件访问驱动，部分系统安全策略可能拦截，仅用于本地硬件检测。",
+          "kind": "exe",
+          "rel_dir": "tools/综合检测/图拉丁硬件检测",
+          "rel_entry_path": "tools/综合检测/图拉丁硬件检测/图拉丁硬件检测.exe",
+          "variants": [
+            {
+              "Label": "图拉丁硬件检测.exe",
+              "Path": "tools/综合检测/图拉丁硬件检测/图拉丁硬件检测.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "data",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "安全证书",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "atiadlxy.dll",
+              "IsDir": false,
+              "Size": 92672
+            },
+            {
+              "Name": "Config.ini",
+              "IsDir": false,
+              "Size": 25
+            },
+            {
+              "Name": "HardWareIoContral.dll",
+              "IsDir": false,
+              "Size": 82944
+            },
+            {
+              "Name": "WinRing0.dll",
+              "IsDir": false,
+              "Size": 65536
+            },
+            {
+              "Name": "WinRing0.sys",
+              "IsDir": false,
+              "Size": 13904
+            },
+            {
+              "Name": "WinRing0.vxd",
+              "IsDir": false,
+              "Size": 8108
+            },
+            {
+              "Name": "WinRing0x64.dll",
+              "IsDir": false,
+              "Size": 61440
+            },
+            {
+              "Name": "WinRing0x64.sys",
+              "IsDir": false,
+              "Size": 13520
+            },
+            {
+              "Name": "图拉丁硬件检测.exe",
+              "IsDir": false,
+              "Size": 488456
+            },
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 330
+            }
+          ],
+          "total_bytes": 863033,
+          "file_count": 16
+        },
+        {
+          "id": "rweverything",
+          "name": "RWEverything",
+          "aliases": [
+            "rw",
+            "rweverything",
+            "pci",
+            "ec",
+            "acpi"
+          ],
+          "category_id": "overview",
+          "category_name": "综合检测",
+          "tag": "底层调试",
+          "description": "读取与调试主板 PCI/PCIe、内存 SPD、ACPI 表、EC 寄存器与 IO 端口的硬核工程师工具。",
+          "warning": "底层 Ring0 寄存器读写工具，请勿随意修改未知寄存器数值，以免导致死机或硬件异常。",
+          "kind": "exe",
+          "rel_dir": "tools/综合检测/RWEverything",
+          "rel_entry_path": "tools/综合检测/RWEverything/Rw.exe",
+          "variants": [
+            {
+              "Label": "Rw.exe",
+              "Path": "tools/综合检测/RWEverything/Rw.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "25308086.IRW",
+              "IsDir": false,
+              "Size": 1275
+            },
+            {
+              "Name": "ATA.IRW",
+              "IsDir": false,
+              "Size": 17624
+            },
+            {
+              "Name": "ATAPI.IRW",
+              "IsDir": false,
+              "Size": 16382
+            },
+            {
+              "Name": "DDR2SPD.IRW",
+              "IsDir": false,
+              "Size": 14418
+            },
+            {
+              "Name": "DDR3SPD.IRW",
+              "IsDir": false,
+              "Size": 13467
+            },
+            {
+              "Name": "DDRSPD.IRW",
+              "IsDir": false,
+              "Size": 14425
+            },
+            {
+              "Name": "PCIBRI.IRW",
+              "IsDir": false,
+              "Size": 17536
+            },
+            {
+              "Name": "PCISTD.IRW",
+              "IsDir": false,
+              "Size": 16249
+            },
+            {
+              "Name": "Rw.exe",
+              "IsDir": false,
+              "Size": 12587935
+            },
+            {
+              "Name": "Rw.ini",
+              "IsDir": false,
+              "Size": 278025
+            },
+            {
+              "Name": "RwDebug.rw",
+              "IsDir": false,
+              "Size": 345
+            },
+            {
+              "Name": "SDRSPD.IRW",
+              "IsDir": false,
+              "Size": 6055
+            },
+            {
+              "Name": "W697HF0.IRW",
+              "IsDir": false,
+              "Size": 4356
+            },
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 393
+            }
+          ],
+          "total_bytes": 12988485,
+          "file_count": 14
+        }
+      ]
+    },
+    {
+      "ID": "cpu",
+      "Name": "CPU工具",
+      "Folder": "处理器工具",
+      "Tools": [
+        {
+          "id": "prime95_bat",
+          "name": "Prime95 一键单烤",
+          "aliases": [
+            "prime95",
+            "p95",
+            "一键烤鸡",
+            "单烤cpu"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "一键烤机",
+          "description": "通过批处理一键启动 Prime95 极限负载测试 CPU 稳定性与散热能力，支持按任意键一键结束烤机。",
+          "warning": "极限负载烤机（负载高于 AIDA64 单烤 FPU），请务必同时开启 CoreTemp 或 HWiNFO 监控温度。",
+          "kind": "bat",
+          "rel_dir": "tools/处理器工具/Prime95",
+          "rel_entry_path": "tools/处理器工具/Prime95/start.bat",
+          "variants": [
+            {
+              "Label": "start.bat",
+              "Path": "tools/处理器工具/Prime95/start.bat",
+              "Kind": "bat"
+            },
+            {
+              "Label": "prime95x86.exe",
+              "Path": "tools/处理器工具/Prime95/prime95x86.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "prime95x64.exe",
+              "Path": "tools/处理器工具/Prime95/prime95x64.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "prime.txt",
+              "IsDir": false,
+              "Size": 288
+            },
+            {
+              "Name": "prime95x64.exe",
+              "IsDir": false,
+              "Size": 37092352
+            },
+            {
+              "Name": "prime95x86.exe",
+              "IsDir": false,
+              "Size": 31141888
+            },
+            {
+              "Name": "start.bat",
+              "IsDir": false,
+              "Size": 828
+            }
+          ],
+          "total_bytes": 68235356,
+          "file_count": 4
+        },
+        {
+          "id": "prime95_gui",
+          "name": "Prime95 完整版",
+          "aliases": [
+            "prime95",
+            "p95",
+            "small fft",
+            "blend"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "极限压力",
+          "description": "原生 Prime95 图形界面版，可自选 Small FFTs（烤 CPU）或 Blend（烤 CPU+内存）。",
+          "warning": "高发热压力测试工具，运行期间请注意 CPU 核心温度与供电散热。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/Prime95",
+          "rel_entry_path": "tools/处理器工具/Prime95/prime95x64.exe",
+          "variants": [
+            {
+              "Label": "prime95x64.exe",
+              "Path": "tools/处理器工具/Prime95/prime95x64.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "prime95x86.exe",
+              "Path": "tools/处理器工具/Prime95/prime95x86.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "start.bat",
+              "Path": "tools/处理器工具/Prime95/start.bat",
+              "Kind": "bat"
+            }
+          ],
+          "files": [
+            {
+              "Name": "prime.txt",
+              "IsDir": false,
+              "Size": 288
+            },
+            {
+              "Name": "prime95x64.exe",
+              "IsDir": false,
+              "Size": 37092352
+            },
+            {
+              "Name": "prime95x86.exe",
+              "IsDir": false,
+              "Size": 31141888
+            },
+            {
+              "Name": "start.bat",
+              "IsDir": false,
+              "Size": 828
+            }
+          ],
+          "total_bytes": 68235356,
+          "file_count": 4
+        },
+        {
+          "id": "linx",
+          "name": "LinX 浮点烤机",
+          "aliases": [
+            "linx",
+            "linpack",
+            "浮点"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "浮点压测",
+          "description": "基于 Intel Linpack 的高强度 CPU 浮点运算与超频稳定性验证工具，支持测算 GFlops 性能。",
+          "warning": "瞬时功耗极高，超频验证时建议分档加压并盯紧温度。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/LinX",
+          "rel_entry_path": "tools/处理器工具/LinX/LinX.exe",
+          "variants": [
+            {
+              "Label": "LinX.exe",
+              "Path": "tools/处理器工具/LinX/LinX.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "linpack_xeon64.exe",
+              "Path": "tools/处理器工具/LinX/linpack_xeon64.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "linpack_xeon32.exe",
+              "Path": "tools/处理器工具/LinX/linpack_xeon32.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "linpack_xeon32.exe",
+              "IsDir": false,
+              "Size": 1427632
+            },
+            {
+              "Name": "linpack_xeon64.exe",
+              "IsDir": false,
+              "Size": 2964144
+            },
+            {
+              "Name": "LinX.exe",
+              "IsDir": false,
+              "Size": 320000
+            },
+            {
+              "Name": "LinX.ini",
+              "IsDir": false,
+              "Size": 711
+            },
+            {
+              "Name": "Speedfan.ini",
+              "IsDir": false,
+              "Size": 144
+            }
+          ],
+          "total_bytes": 4712631,
+          "file_count": 5
+        },
+        {
+          "id": "superpi",
+          "name": "SuperPI 单核测试",
+          "aliases": [
+            "superpi",
+            "pi",
+            "圆周率",
+            "单核"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "单核跑分",
+          "description": "经典的单线程圆周率计算跑分工具（常用 1M / 32M），用于评估 CPU 单核效能与内存延迟。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/superpi",
+          "rel_entry_path": "tools/处理器工具/superpi/Superpi.exe",
+          "variants": [
+            {
+              "Label": "Superpi.exe",
+              "Path": "tools/处理器工具/superpi/Superpi.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "pi.ini",
+              "IsDir": false,
+              "Size": 387
+            },
+            {
+              "Name": "Superpi.exe",
+              "IsDir": false,
+              "Size": 105352
+            }
+          ],
+          "total_bytes": 105739,
+          "file_count": 2
+        },
+        {
+          "id": "wprime",
+          "name": "wPrime 多核测试",
+          "aliases": [
+            "wprime",
+            "多核跑分"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "多核跑分",
+          "description": "多线程平方根计算基准测试工具（常用 32M / 1024M），用于测试多核心协同计算能力。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/wPrime",
+          "rel_entry_path": "tools/处理器工具/wPrime/wPrime.exe",
+          "variants": [
+            {
+              "Label": "wPrime.exe",
+              "Path": "tools/处理器工具/wPrime/wPrime.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "wPrime.exe",
+              "IsDir": false,
+              "Size": 2699264
+            }
+          ],
+          "total_bytes": 2699264,
+          "file_count": 1
+        },
+        {
+          "id": "xiangqi",
+          "name": "国际象棋基准 (Fritz)",
+          "aliases": [
+            "xiangqi",
+            "国际象棋",
+            "fritz",
+            "chess"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "经典跑分",
+          "description": "Fritz Chess Benchmark 国际象棋跑分，测试处理器整数AI计算吞吐量与多线程倍率。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/XIANGQI",
+          "rel_entry_path": "tools/处理器工具/XIANGQI/xiangqi.exe",
+          "variants": [
+            {
+              "Label": "xiangqi.exe",
+              "Path": "tools/处理器工具/XIANGQI/xiangqi.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "xiangqi.exe",
+              "IsDir": false,
+              "Size": 930708
+            }
+          ],
+          "total_bytes": 930708,
+          "file_count": 1
+        },
+        {
+          "id": "throttlestop",
+          "name": "ThrottleStop 降压调校",
+          "aliases": [
+            "throttlestop",
+            "降压",
+            "功耗墙",
+            "解锁"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "电压/功耗",
+          "description": "针对 Intel 笔记本/桌面处理器的频率监控、降压降温、功耗墙解锁与 BD PROCHOT 调节利器。",
+          "warning": "调压或解锁功耗墙存在蓝屏风险，建议小步微调并先保存默认配置。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/ThrottleStop",
+          "rel_entry_path": "tools/处理器工具/ThrottleStop/ThrottleStop.exe",
+          "variants": [
+            {
+              "Label": "ThrottleStop.exe",
+              "Path": "tools/处理器工具/ThrottleStop/ThrottleStop.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "ThrottleStop.exe",
+              "IsDir": false,
+              "Size": 4000864
+            },
+            {
+              "Name": "ThrottleStop.ini",
+              "IsDir": false,
+              "Size": 1987
+            }
+          ],
+          "total_bytes": 4002851,
+          "file_count": 2
+        },
+        {
+          "id": "thread_bomb",
+          "name": "线程炸弹 (加密压缩包)",
+          "aliases": [
+            "线程炸弹",
+            "多线程"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "极限压测",
+          "description": "多线程调度极限压测小工具，用于检验高线程并发下的系统响应。",
+          "warning": "加密压缩包（解压密码通常为 tulading），运行后可能造成系统短时卡顿，详见目录声明。",
+          "kind": "archive",
+          "rel_dir": "tools/处理器工具/线程炸弹",
+          "rel_entry_path": "tools/处理器工具/线程炸弹/线程炸弹.zip",
+          "variants": [
+            {
+              "Label": "线程炸弹.zip",
+              "Path": "tools/处理器工具/线程炸弹/线程炸弹.zip",
+              "Kind": "archive"
+            }
+          ],
+          "password_note": "解压密码：tulading",
+          "files": [
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 389
+            },
+            {
+              "Name": "线程炸弹.zip",
+              "IsDir": false,
+              "Size": 1928155
+            },
+            {
+              "Name": "解压密码.txt",
+              "IsDir": false,
+              "Size": 18
+            }
+          ],
+          "total_bytes": 1928562,
+          "file_count": 3
+        },
+        {
+          "id": "dyn_cpu_cpuz",
+          "name": "CPUZ",
+          "aliases": [
+            "CPUZ"
+          ],
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "tag": "本地工具",
+          "description": "从目录 tools/处理器工具/CPUZ 自动发现的工具。",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/CPUZ",
+          "rel_entry_path": "tools/处理器工具/CPUZ/cpuz64.exe",
+          "variants": [
+            {
+              "Label": "cpuz64.exe",
+              "Path": "tools/处理器工具/CPUZ/cpuz64.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "cpuz64.exe",
+              "IsDir": false,
+              "Size": 4452248
+            }
+          ],
+          "total_bytes": 4452248,
+          "file_count": 1
+        }
+      ]
+    },
+    {
+      "ID": "ram",
+      "Name": "内存工具",
+      "Folder": "内存工具",
+      "Tools": [
+        {
+          "id": "tm5",
+          "name": "TestMem5 (TM5)",
+          "aliases": [
+            "tm5",
+            "testmem5",
+            "内存烤机",
+            "超频测试"
+          ],
+          "category_id": "ram",
+          "category_name": "内存工具",
+          "tag": "超频烤机",
+          "description": "内存超频玩家最常用的稳定性拷机软件，可快速抓出时序过紧或电压不足导致的错误。",
+          "kind": "exe",
+          "rel_dir": "tools/内存工具/tm5",
+          "rel_entry_path": "tools/内存工具/tm5/TM5.exe",
+          "variants": [
+            {
+              "Label": "TM5.exe",
+              "Path": "tools/内存工具/tm5/TM5.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "bin",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "TM5.exe",
+              "IsDir": false,
+              "Size": 33280
+            }
+          ],
+          "total_bytes": 48917,
+          "file_count": 4
+        },
+        {
+          "id": "memtest64",
+          "name": "MemTest64",
+          "aliases": [
+            "memtest64",
+            "techpowerup"
+          ],
+          "category_id": "ram",
+          "category_name": "内存工具",
+          "tag": "64位检测",
+          "description": "TechPowerUp 出品的 64 位桌面内存稳定性测试工具，支持在 Windows 下大范围分配内存测试。",
+          "kind": "exe",
+          "rel_dir": "tools/内存工具/memtest64",
+          "rel_entry_path": "tools/内存工具/memtest64/MemTest64.exe",
+          "variants": [
+            {
+              "Label": "MemTest64.exe",
+              "Path": "tools/内存工具/memtest64/MemTest64.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "MemTest64.exe",
+              "IsDir": false,
+              "Size": 3253544
+            }
+          ],
+          "total_bytes": 3253544,
+          "file_count": 1
+        },
+        {
+          "id": "memtest",
+          "name": "MemTest 经典版",
+          "aliases": [
+            "memtest",
+            "内存检测"
+          ],
+          "category_id": "ram",
+          "category_name": "内存工具",
+          "tag": "经典检测",
+          "description": "轻量级 Windows 内存坏块与稳定性扫描工具，适合多开并发测试全容量。",
+          "kind": "exe",
+          "rel_dir": "tools/内存工具/memtest",
+          "rel_entry_path": "tools/内存工具/memtest/memtest.exe",
+          "variants": [
+            {
+              "Label": "memtest.exe",
+              "Path": "tools/内存工具/memtest/memtest.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "memtest.exe",
+              "IsDir": false,
+              "Size": 24576
+            }
+          ],
+          "total_bytes": 24576,
+          "file_count": 1
+        },
+        {
+          "id": "mem_clean",
+          "name": "内存整理 (加密压缩包)",
+          "aliases": [
+            "内存整理",
+            "sunlight",
+            "清理内存"
+          ],
+          "category_id": "ram",
+          "category_name": "内存工具",
+          "tag": "加密压缩",
+          "description": "轻量内存工作集清理释放工具（加密打包存储，密码见右侧密码说明）。",
+          "warning": "压缩包已加密（解压密码请查看右侧密码提示与目录声明）。",
+          "kind": "archive",
+          "rel_dir": "tools/内存工具/内存整理",
+          "rel_entry_path": "tools/内存工具/内存整理/内存整理.zip",
+          "variants": [
+            {
+              "Label": "内存整理.zip",
+              "Path": "tools/内存工具/内存整理/内存整理.zip",
+              "Kind": "archive"
+            }
+          ],
+          "password_note": "解压密码：tulading",
+          "files": [
+            {
+              "Name": "内存整理.zip",
+              "IsDir": false,
+              "Size": 416044
+            },
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 302
+            },
+            {
+              "Name": "解压密码.txt",
+              "IsDir": false,
+              "Size": 18
+            }
+          ],
+          "total_bytes": 416364,
+          "file_count": 3
+        }
+      ]
+    },
+    {
+      "ID": "gpu",
+      "Name": "显卡工具",
+      "Folder": "显卡工具",
+      "Tools": [
+        {
+          "id": "gpuinfo",
+          "name": "GPUInfo (核心查看)",
+          "aliases": [
+            "gpuinfo",
+            "显卡信息"
+          ],
+          "category_id": "gpu",
+          "category_name": "显卡工具",
+          "tag": "快速识别",
+          "description": "国内开发者制作的小巧显卡参数快速检测工具，直观展示显卡基础规格。",
+          "kind": "exe",
+          "rel_dir": "tools/显卡工具/gpuinfo",
+          "rel_entry_path": "tools/显卡工具/gpuinfo/Gpuinfo.exe",
+          "variants": [
+            {
+              "Label": "Gpuinfo.exe",
+              "Path": "tools/显卡工具/gpuinfo/Gpuinfo.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "Gpuinfo.exe",
+              "IsDir": false,
+              "Size": 1137664
+            }
+          ],
+          "total_bytes": 1137664,
+          "file_count": 1
+        },
+        {
+          "id": "ddu",
+          "name": "DDU 显卡驱动彻底卸载",
+          "aliases": [
+            "ddu",
+            "display driver uninstaller",
+            "驱动卸载"
+          ],
+          "category_id": "gpu",
+          "category_name": "显卡工具",
+          "tag": "驱动清理",
+          "description": "彻底清除 NVIDIA / AMD / Intel 显卡驱动残留与注册表项，换卡或驱动异常必用（建议安全模式下使用）。",
+          "warning": "卸载驱动后屏幕将暂时回到基础分辨率，建议提前准备好目标驱动安装包。",
+          "kind": "exe",
+          "rel_dir": "tools/显卡工具/DDU v18.0.1.9",
+          "rel_entry_path": "tools/显卡工具/DDU v18.0.1.9/Display Driver Uninstaller.exe",
+          "variants": [
+            {
+              "Label": "Display Driver Uninstaller.exe",
+              "Path": "tools/显卡工具/DDU v18.0.1.9/Display Driver Uninstaller.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "settings",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "Display Driver Uninstaller.exe",
+              "IsDir": false,
+              "Size": 1395000
+            },
+            {
+              "Name": "Display Driver Uninstaller.pdb",
+              "IsDir": false,
+              "Size": 681472
+            }
+          ],
+          "total_bytes": 2770274,
+          "file_count": 70
+        },
+        {
+          "id": "gputest",
+          "name": "GpuTest 压力测试",
+          "aliases": [
+            "gputest",
+            "opengl",
+            "烤机"
+          ],
+          "category_id": "gpu",
+          "category_name": "显卡工具",
+          "tag": "OpenGL压测",
+          "description": "集成 FurMark、TessMark、GiMark 等多种 OpenGL 场景的 64 位显卡基准测试与压力工具。",
+          "kind": "exe",
+          "rel_dir": "tools/显卡工具/GpuTest_Windows x64",
+          "rel_entry_path": "tools/显卡工具/GpuTest_Windows x64/GpuTest_GUI.exe",
+          "variants": [
+            {
+              "Label": "GpuTest_GUI.exe",
+              "Path": "tools/显卡工具/GpuTest_Windows x64/GpuTest_GUI.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "GpuTest.exe",
+              "Path": "tools/显卡工具/GpuTest_Windows x64/GpuTest.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "data",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "GpuTest.exe",
+              "IsDir": false,
+              "Size": 244224
+            },
+            {
+              "Name": "GpuTest_GUI.exe",
+              "IsDir": false,
+              "Size": 245248
+            },
+            {
+              "Name": "gxl_3d_x64.dll",
+              "IsDir": false,
+              "Size": 537088
+            }
+          ],
+          "total_bytes": 1883347,
+          "file_count": 17
+        },
+        {
+          "id": "nvinspector",
+          "name": "NVIDIA Inspector",
+          "aliases": [
+            "nvidia",
+            "inspector",
+            "n卡",
+            "超频",
+            "驱动配置"
+          ],
+          "category_id": "gpu",
+          "category_name": "显卡工具",
+          "tag": "N卡调校",
+          "description": "NVIDIA 显卡高级状态查看、多档位帧率限制与驱动隐藏参数调校工具。",
+          "kind": "exe",
+          "rel_dir": "tools/显卡工具/nvidiaInspector",
+          "rel_entry_path": "tools/显卡工具/nvidiaInspector/nvidiaInspector.exe",
+          "variants": [
+            {
+              "Label": "nvidiaInspector.exe",
+              "Path": "tools/显卡工具/nvidiaInspector/nvidiaInspector.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "CustomSettingNames_en-EN.xml",
+              "IsDir": false,
+              "Size": 62978
+            },
+            {
+              "Name": "nvidiaInspector.exe",
+              "IsDir": false,
+              "Size": 611840
+            }
+          ],
+          "total_bytes": 674818,
+          "file_count": 2
+        },
+        {
+          "id": "amdclocktool",
+          "name": "AMD GPU Clock Tool",
+          "aliases": [
+            "amd",
+            "clock",
+            "a卡"
+          ],
+          "category_id": "gpu",
+          "category_name": "显卡工具",
+          "tag": "A卡调校",
+          "description": "针对经典 AMD/ATI 显卡的频率查看与时钟控制辅助工具。",
+          "kind": "exe",
+          "rel_dir": "tools/显卡工具/AMDGPUClockTool",
+          "rel_entry_path": "tools/显卡工具/AMDGPUClockTool/AMDGPUClockTool.exe",
+          "variants": [
+            {
+              "Label": "AMDGPUClockTool.exe",
+              "Path": "tools/显卡工具/AMDGPUClockTool/AMDGPUClockTool.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "tools_driver",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "AMDGPUClockTool.exe",
+              "IsDir": false,
+              "Size": 393216
+            },
+            {
+              "Name": "toollib.dll",
+              "IsDir": false,
+              "Size": 3276800
+            },
+            {
+              "Name": "ULPSCtrl.dll",
+              "IsDir": false,
+              "Size": 81920
+            }
+          ],
+          "total_bytes": 4733716,
+          "file_count": 17
+        }
+      ]
+    },
+    {
+      "ID": "disk",
+      "Name": "硬盘工具",
+      "Folder": "硬盘工具",
+      "Tools": [
+        {
+          "id": "crystaldiskinfo",
+          "name": "CrystalDiskInfo",
+          "aliases": [
+            "cdi",
+            "crystaldiskinfo",
+            "smart",
+            "通电时间",
+            "健康度"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "SMART健康",
+          "description": "查看硬盘 S.M.A.R.T. 健康状态、通电次数、累计通电时间、读写量、实时温度与 NVMe 接口协议。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/CrystalDiskInfo",
+          "rel_entry_path": "tools/硬盘工具/CrystalDiskInfo/DiskInfo64.exe",
+          "variants": [
+            {
+              "Label": "DiskInfo64.exe",
+              "Path": "tools/硬盘工具/CrystalDiskInfo/DiskInfo64.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "DiskInfo32.exe",
+              "Path": "tools/硬盘工具/CrystalDiskInfo/DiskInfo32.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "DiskInfoA64S.exe",
+              "Path": "tools/硬盘工具/CrystalDiskInfo/DiskInfoA64S.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "CdiResource",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "DiskInfo.ini",
+              "IsDir": false,
+              "Size": 411
+            },
+            {
+              "Name": "DiskInfo32.exe",
+              "IsDir": false,
+              "Size": 2632968
+            },
+            {
+              "Name": "DiskInfo64.exe",
+              "IsDir": false,
+              "Size": 2847496
+            },
+            {
+              "Name": "DiskInfoA64S.exe",
+              "IsDir": false,
+              "Size": 2971416
+            }
+          ],
+          "total_bytes": 20304180,
+          "file_count": 220
+        },
+        {
+          "id": "crystaldiskmark",
+          "name": "CrystalDiskMark",
+          "aliases": [
+            "cdm",
+            "crystaldiskmark",
+            "测速",
+            "4k",
+            "跑分"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "读写测速",
+          "description": "最常用的固态/机械硬盘顺序读写与 4K 随机读写性能基准跑分工具。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/CrystalDiskMark",
+          "rel_entry_path": "tools/硬盘工具/CrystalDiskMark/DiskMarkx64.exe",
+          "variants": [
+            {
+              "Label": "DiskMarkx64.exe",
+              "Path": "tools/硬盘工具/CrystalDiskMark/DiskMarkx64.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "DiskMark.exe",
+              "Path": "tools/硬盘工具/CrystalDiskMark/DiskMark.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "CdmResource",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "DiskMark.exe",
+              "IsDir": false,
+              "Size": 651296
+            },
+            {
+              "Name": "DiskMark.ini",
+              "IsDir": false,
+              "Size": 139
+            },
+            {
+              "Name": "DiskMarkx64.exe",
+              "IsDir": false,
+              "Size": 815136
+            },
+            {
+              "Name": "DiskMarkX64.ini",
+              "IsDir": false,
+              "Size": 139
+            }
+          ],
+          "total_bytes": 6651887,
+          "file_count": 36
+        },
+        {
+          "id": "asssd",
+          "name": "AS SSD Benchmark",
+          "aliases": [
+            "asssd",
+            "as ssd",
+            "4k对齐",
+            "ssd测速"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "4K对齐/测速",
+          "description": "专为 SSD 设计的测速与 4K 对齐检测工具，一眼核对分区是否 4K-OK 及驱动是否启用。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/ASSSDBenchmark",
+          "rel_entry_path": "tools/硬盘工具/ASSSDBenchmark/ASSSDBenchmark.exe",
+          "variants": [
+            {
+              "Label": "ASSSDBenchmark.exe",
+              "Path": "tools/硬盘工具/ASSSDBenchmark/ASSSDBenchmark.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "en-US",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "ASSSDBenchmark.exe",
+              "IsDir": false,
+              "Size": 450560
+            }
+          ],
+          "total_bytes": 602112,
+          "file_count": 3
+        },
+        {
+          "id": "atto",
+          "name": "ATTO Disk Benchmark",
+          "aliases": [
+            "atto",
+            "不同文件大小测速"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "多块测速",
+          "description": "按 512B 至 64MB 不同数据包大小分级测试硬盘读写性能，常用于验证标称峰值速度。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/ATTODISKBENCHMARK",
+          "rel_entry_path": "tools/硬盘工具/ATTODISKBENCHMARK/ATTO 磁盘基准测试.exe",
+          "variants": [
+            {
+              "Label": "ATTO 磁盘基准测试.exe",
+              "Path": "tools/硬盘工具/ATTODISKBENCHMARK/ATTO 磁盘基准测试.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "ATTO 磁盘基准测试.exe",
+              "IsDir": false,
+              "Size": 5489360
+            }
+          ],
+          "total_bytes": 5489360,
+          "file_count": 1
+        },
+        {
+          "id": "h2testw",
+          "name": "H2testw (U盘扩容校验)",
+          "aliases": [
+            "h2testw",
+            "u盘校验",
+            "扩容盘"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "扩容检测",
+          "description": "国际公认的 U 盘/存储卡实际容量写入校验工具，专门识破虚标扩容盘。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/H2testw",
+          "rel_entry_path": "tools/硬盘工具/H2testw/h2testw_1.4.exe",
+          "variants": [
+            {
+              "Label": "h2testw_1.4.exe",
+              "Path": "tools/硬盘工具/H2testw/h2testw_1.4.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "h2testw_1.4.exe",
+              "IsDir": false,
+              "Size": 418816
+            }
+          ],
+          "total_bytes": 418816,
+          "file_count": 1
+        },
+        {
+          "id": "mydisktest",
+          "name": "MyDiskTest 扩容检测",
+          "aliases": [
+            "mydisktest",
+            "扩容",
+            "u盘"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "快速扩容测",
+          "description": "U 盘/TF 卡快速扩容检测与坏块扫描工具，测试速度比 H2testw 更快。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/mydisktest",
+          "rel_entry_path": "tools/硬盘工具/mydisktest/MyDiskTest_v298.exe",
+          "variants": [
+            {
+              "Label": "MyDiskTest_v298.exe",
+              "Path": "tools/硬盘工具/mydisktest/MyDiskTest_v298.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "MyDiskTest_v298.exe",
+              "IsDir": false,
+              "Size": 83968
+            }
+          ],
+          "total_bytes": 83968,
+          "file_count": 1
+        },
+        {
+          "id": "urwtest",
+          "name": "URWTest 全盘校验",
+          "aliases": [
+            "urwtest",
+            "全盘读写"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "读写校验",
+          "description": "全盘写入并回读校验工具，验证 SSD/U 盘缓存外真实性能与数据一致性。",
+          "warning": "涉及磁盘写入操作，请务必先确认目标盘符无重要数据或选择空闲测试。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/URWTEST",
+          "rel_entry_path": "tools/硬盘工具/URWTEST/urwtest_v18.exe",
+          "variants": [
+            {
+              "Label": "urwtest_v18.exe",
+              "Path": "tools/硬盘工具/URWTEST/urwtest_v18.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "urwtest_v18.exe",
+              "IsDir": false,
+              "Size": 41984
+            }
+          ],
+          "total_bytes": 41984,
+          "file_count": 1
+        },
+        {
+          "id": "spacesniffer",
+          "name": "SpaceSniffer 空间透视",
+          "aliases": [
+            "spacesniffer",
+            "磁盘空间",
+            "大文件"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "空间分析",
+          "description": "以直观树状方块实时可视化硬盘各目录占用比例，快速揪出 C 盘爆满元凶。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/SpaceSniffer",
+          "rel_entry_path": "tools/硬盘工具/SpaceSniffer/SpaceSniffer.exe",
+          "variants": [
+            {
+              "Label": "SpaceSniffer.exe",
+              "Path": "tools/硬盘工具/SpaceSniffer/SpaceSniffer.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "SpaceSniffer.exe",
+              "IsDir": false,
+              "Size": 2309632
+            }
+          ],
+          "total_bytes": 2309632,
+          "file_count": 1
+        },
+        {
+          "id": "windirstat",
+          "name": "WinDirStat 空间统计",
+          "aliases": [
+            "windirstat",
+            "磁盘分析"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "空间统计",
+          "description": "经典的开源磁盘目录与文件类型占用统计软件，配合扩展名色块图精准定位大文件。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/windirstat",
+          "rel_entry_path": "tools/硬盘工具/windirstat/windirstat.exe",
+          "variants": [
+            {
+              "Label": "windirstat.exe",
+              "Path": "tools/硬盘工具/windirstat/windirstat.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "windirstat.exe",
+              "IsDir": false,
+              "Size": 651264
+            }
+          ],
+          "total_bytes": 651264,
+          "file_count": 1
+        },
+        {
+          "id": "defraggler",
+          "name": "Defraggler 碎片整理",
+          "aliases": [
+            "defraggler",
+            "碎片整理"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "机械整理",
+          "description": "机械硬盘（HDD）文件与空闲空间碎片整理工具（固态硬盘无需整理碎片）。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/Defraggler",
+          "rel_entry_path": "tools/硬盘工具/Defraggler/Defraggler.exe",
+          "variants": [
+            {
+              "Label": "Defraggler.exe",
+              "Path": "tools/硬盘工具/Defraggler/Defraggler.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "df.exe",
+              "Path": "tools/硬盘工具/Defraggler/df.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "lang",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "Defraggler.exe",
+              "IsDir": false,
+              "Size": 3430104
+            },
+            {
+              "Name": "Defraggler.ini",
+              "IsDir": false,
+              "Size": 1872
+            },
+            {
+              "Name": "DefragglerShell.dll",
+              "IsDir": false,
+              "Size": 171224
+            },
+            {
+              "Name": "df.exe",
+              "IsDir": false,
+              "Size": 1181400
+            },
+            {
+              "Name": "portable.dat",
+              "IsDir": false,
+              "Size": 10
+            },
+            {
+              "Name": "statistics.bin",
+              "IsDir": false,
+              "Size": 728
+            }
+          ],
+          "total_bytes": 4821178,
+          "file_count": 7
+        },
+        {
+          "id": "ssdz",
+          "name": "SSD-Z",
+          "aliases": [
+            "ssdz",
+            "ssd-z",
+            "主控"
+          ],
+          "category_id": "disk",
+          "category_name": "硬盘工具",
+          "tag": "主控/颗粒",
+          "description": "类似 CPU-Z 风格的固态硬盘信息工具，用于查询主控、闪存制程与 TRIM 状态。",
+          "kind": "exe",
+          "rel_dir": "tools/硬盘工具/SSDZ",
+          "rel_entry_path": "tools/硬盘工具/SSDZ/SSDZ.exe",
+          "variants": [
+            {
+              "Label": "SSDZ.exe",
+              "Path": "tools/硬盘工具/SSDZ/SSDZ.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "SSDZ.exe",
+              "IsDir": false,
+              "Size": 1041920
+            },
+            {
+              "Name": "SSDZ.ini",
+              "IsDir": false,
+              "Size": 134
+            }
+          ],
+          "total_bytes": 1042054,
+          "file_count": 2
+        }
+      ]
+    },
+    {
+      "ID": "screen",
+      "Name": "屏幕工具",
+      "Folder": "显示器工具",
+      "Tools": [
+        {
+          "id": "tui_screen_test",
+          "name": "内置纯色坏点检测 (TUI)",
+          "aliases": [
+            "坏点",
+            "纯色",
+            "屏幕检测",
+            "漏光",
+            "tui"
+          ],
+          "category_id": "screen",
+          "category_name": "屏幕工具",
+          "tag": "内置工具",
+          "description": "原生全屏纯色坏点与色阶渐变检测器，支持 红/绿/蓝/白/黑/灰阶/棋盘格/24-bit 平滑渐变全屏切换。",
+          "kind": "tui",
+          "rel_dir": "内置 TUI 模块",
+          "total_bytes": 0,
+          "file_count": 0
+        },
+        {
+          "id": "monitorinfo",
+          "name": "色域与面板检测",
+          "aliases": [
+            "monitorinfo",
+            "色域",
+            "edid",
+            "面板"
+          ],
+          "category_id": "screen",
+          "category_name": "屏幕工具",
+          "tag": "色域/面板",
+          "description": "读取显示器 EDID 原生色域坐标（sRGB / NTSC / DCI-P3 覆盖计算）、出厂日期与面板型号。",
+          "kind": "exe",
+          "rel_dir": "tools/显示器工具/色域检测",
+          "rel_entry_path": "tools/显示器工具/色域检测/monitorinfo.exe",
+          "variants": [
+            {
+              "Label": "monitorinfo.exe",
+              "Path": "tools/显示器工具/色域检测/monitorinfo.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "monitorinfo.exe",
+              "IsDir": false,
+              "Size": 1013248
+            }
+          ],
+          "total_bytes": 1013248,
+          "file_count": 1
+        },
+        {
+          "id": "online_screen_test",
+          "name": "在线屏幕综合测试",
+          "aliases": [
+            "在线屏幕测试",
+            "屏幕测试",
+            "响应时间"
+          ],
+          "category_id": "screen",
+          "category_name": "屏幕工具",
+          "tag": "网页测试",
+          "description": "调用浏览器打开在线屏幕测试页面，检查坏点、对比度、灰度渐变与拖影。",
+          "kind": "bat",
+          "rel_dir": "tools/显示器工具/在线屏幕测试",
+          "rel_entry_path": "tools/显示器工具/在线屏幕测试/在线屏幕测试.bat",
+          "variants": [
+            {
+              "Label": "在线屏幕测试.bat",
+              "Path": "tools/显示器工具/在线屏幕测试/在线屏幕测试.bat",
+              "Kind": "bat"
+            }
+          ],
+          "files": [
+            {
+              "Name": "在线屏幕测试.bat",
+              "IsDir": false,
+              "Size": 38
+            }
+          ],
+          "total_bytes": 38,
+          "file_count": 1
+        }
+      ]
+    },
+    {
+      "ID": "periph",
+      "Name": "外设工具",
+      "Folder": "外设工具",
+      "Tools": [
+        {
+          "id": "keyboard_test",
+          "name": "Keyboard Test Utility",
+          "aliases": [
+            "keyboard",
+            "键盘测试",
+            "连键",
+            "无冲"
+          ],
+          "category_id": "periph",
+          "category_name": "外设工具",
+          "tag": "键盘/无冲",
+          "description": "机械/薄膜键盘全键触发与多键无冲测试工具，快速排查失灵按键或连击轴体。",
+          "kind": "exe",
+          "rel_dir": "tools/外设工具/Keyboard Test Utility",
+          "rel_entry_path": "tools/外设工具/Keyboard Test Utility/Keyboard Test Utility.exe",
+          "variants": [
+            {
+              "Label": "Keyboard Test Utility.exe",
+              "Path": "tools/外设工具/Keyboard Test Utility/Keyboard Test Utility.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "Keyboard Test Utility.exe",
+              "IsDir": false,
+              "Size": 1976320
+            }
+          ],
+          "total_bytes": 1976320,
+          "file_count": 1
+        },
+        {
+          "id": "double_click_test",
+          "name": "鼠标单击变双击测试器",
+          "aliases": [
+            "双击",
+            "微动",
+            "鼠标测试"
+          ],
+          "category_id": "periph",
+          "category_name": "外设工具",
+          "tag": "微动排查",
+          "description": "专门检测鼠标左右中键微动老化导致的连击/双击故障，统计极短间隔误触次数。",
+          "kind": "exe",
+          "rel_dir": "tools/外设工具/鼠标单机变双击测试器",
+          "rel_entry_path": "tools/外设工具/鼠标单机变双击测试器/鼠标单击变双击测试器V2.0.exe",
+          "variants": [
+            {
+              "Label": "鼠标单击变双击测试器V2.0.exe",
+              "Path": "tools/外设工具/鼠标单机变双击测试器/鼠标单击变双击测试器V2.0.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "鼠标单击变双击测试器V2.0.exe",
+              "IsDir": false,
+              "Size": 583168
+            }
+          ],
+          "total_bytes": 583168,
+          "file_count": 1
+        },
+        {
+          "id": "mouserate",
+          "name": "MouseRate 鼠标回报率测试",
+          "aliases": [
+            "mouserate",
+            "回报率",
+            "轮询率",
+            "hz"
+          ],
+          "category_id": "periph",
+          "category_name": "外设工具",
+          "tag": "回报率Hz",
+          "description": "实时测定游戏鼠标 USB 回报率（125Hz / 500Hz / 1000Hz / 4000Hz 等）。",
+          "kind": "exe",
+          "rel_dir": "tools/外设工具/MOUSERATE",
+          "rel_entry_path": "tools/外设工具/MOUSERATE/MOUSERATE.EXE",
+          "variants": [
+            {
+              "Label": "MOUSERATE.EXE",
+              "Path": "tools/外设工具/MOUSERATE/MOUSERATE.EXE",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "MOUSERATE.EXE",
+              "IsDir": false,
+              "Size": 19968
+            }
+          ],
+          "total_bytes": 19968,
+          "file_count": 1
+        },
+        {
+          "id": "areson_mouse",
+          "name": "AresonMouseTest 轨迹/画线",
+          "aliases": [
+            "areson",
+            "画线",
+            "蚊香图",
+            "鼠标测试"
+          ],
+          "category_id": "periph",
+          "category_name": "外设工具",
+          "tag": "轨迹/按键",
+          "description": "综合鼠标按键、滚轮与移动平滑度测试工具，支持绘制画线轨迹排查丢帧跳标。",
+          "kind": "exe",
+          "rel_dir": "tools/外设工具/AresonMouseTest",
+          "rel_entry_path": "tools/外设工具/AresonMouseTest/鼠标测试软件AresonMouseTestProgram.exe",
+          "variants": [
+            {
+              "Label": "鼠标测试软件AresonMouseTestProgram.exe",
+              "Path": "tools/外设工具/AresonMouseTest/鼠标测试软件AresonMouseTestProgram.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "鼠标测试软件AresonMouseTestProgram.exe",
+              "IsDir": false,
+              "Size": 208896
+            }
+          ],
+          "total_bytes": 208896,
+          "file_count": 1
+        }
+      ]
+    },
+    {
+      "ID": "other",
+      "Name": "其他工具",
+      "Folder": "其他工具",
+      "Tools": [
+        {
+          "id": "cpu_tier",
+          "name": "CPU 性能天梯图",
+          "aliases": [
+            "cpu天梯图",
+            "天梯图",
+            "处理器排行"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "天梯图",
+          "description": "桌面与移动端处理器综合性能排行天梯大图（右侧面板支持预览缩略图，回车调用看图器打开原图）。",
+          "kind": "img",
+          "rel_dir": "tools/其他工具/天梯图",
+          "rel_entry_path": "tools/其他工具/天梯图/CPU天梯图.jpg",
+          "variants": [
+            {
+              "Label": "CPU天梯图.jpg",
+              "Path": "tools/其他工具/天梯图/CPU天梯图.jpg",
+              "Kind": "img"
+            },
+            {
+              "Label": "显卡天梯图.jpg",
+              "Path": "tools/其他工具/天梯图/显卡天梯图.jpg",
+              "Kind": "img"
+            }
+          ],
+          "files": [
+            {
+              "Name": "CPU天梯图.jpg",
+              "IsDir": false,
+              "Size": 1073462
+            },
+            {
+              "Name": "显卡天梯图.jpg",
+              "IsDir": false,
+              "Size": 993398
+            }
+          ],
+          "total_bytes": 2066860,
+          "file_count": 2
+        },
+        {
+          "id": "gpu_tier",
+          "name": "显卡性能天梯图",
+          "aliases": [
+            "显卡天梯图",
+            "天梯图",
+            "gpu排行"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "天梯图",
+          "description": "NVIDIA / AMD / Intel 显卡桌面与笔记本性能排行天梯大图（右侧面板实时缩略预览，回车看原图）。",
+          "kind": "img",
+          "rel_dir": "tools/其他工具/天梯图",
+          "rel_entry_path": "tools/其他工具/天梯图/显卡天梯图.jpg",
+          "variants": [
+            {
+              "Label": "显卡天梯图.jpg",
+              "Path": "tools/其他工具/天梯图/显卡天梯图.jpg",
+              "Kind": "img"
+            },
+            {
+              "Label": "CPU天梯图.jpg",
+              "Path": "tools/其他工具/天梯图/CPU天梯图.jpg",
+              "Kind": "img"
+            }
+          ],
+          "files": [
+            {
+              "Name": "CPU天梯图.jpg",
+              "IsDir": false,
+              "Size": 1073462
+            },
+            {
+              "Name": "显卡天梯图.jpg",
+              "IsDir": false,
+              "Size": 993398
+            }
+          ],
+          "total_bytes": 2066860,
+          "file_count": 2
+        },
+        {
+          "id": "procexp",
+          "name": "Process Explorer",
+          "aliases": [
+            "procexp",
+            "进程",
+            "sysinternals"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "增强进程",
+          "description": "微软 Sysinternals 出品的高级任务管理器，可查看进程树、句柄锁占用、DLL 与 GPU 占用。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/procexp",
+          "rel_entry_path": "tools/其他工具/procexp/procexp.exe",
+          "variants": [
+            {
+              "Label": "procexp.exe",
+              "Path": "tools/其他工具/procexp/procexp.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "procexp.exe",
+              "IsDir": false,
+              "Size": 3412856
+            }
+          ],
+          "total_bytes": 3412856,
+          "file_count": 1
+        },
+        {
+          "id": "bluescreenview",
+          "name": "BlueScreenView 蓝屏分析",
+          "aliases": [
+            "bluescreenview",
+            "蓝屏",
+            "bsod",
+            "dump"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "蓝屏排错",
+          "description": "自动扫描 Minidump 蓝屏转储文件，直接定位引发蓝屏的故障驱动或系统模块。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/bluescreenview",
+          "rel_entry_path": "tools/其他工具/bluescreenview/BlueScreenViewx64.exe",
+          "variants": [
+            {
+              "Label": "BlueScreenViewx64.exe",
+              "Path": "tools/其他工具/bluescreenview/BlueScreenViewx64.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "BlueScreenViewx86.exe",
+              "Path": "tools/其他工具/bluescreenview/BlueScreenViewx86.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "BlueScreenViewx64.cfg",
+              "IsDir": false,
+              "Size": 951
+            },
+            {
+              "Name": "BlueScreenViewx64.exe",
+              "IsDir": false,
+              "Size": 146528
+            },
+            {
+              "Name": "BlueScreenViewx86.exe",
+              "IsDir": false,
+              "Size": 61024
+            }
+          ],
+          "total_bytes": 208503,
+          "file_count": 3
+        },
+        {
+          "id": "windbg",
+          "name": "WinDbg 调试器",
+          "aliases": [
+            "windbg",
+            "dump分析",
+            "调试"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "内核调试",
+          "description": "微软官方内核/蓝屏 Dump 深度分析调试器。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/WinDbg",
+          "rel_entry_path": "tools/其他工具/WinDbg/windbg.exe",
+          "variants": [
+            {
+              "Label": "windbg.exe",
+              "Path": "tools/其他工具/WinDbg/windbg.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "windbg.exe",
+              "IsDir": false,
+              "Size": 642320
+            }
+          ],
+          "total_bytes": 642320,
+          "file_count": 1
+        },
+        {
+          "id": "rufus",
+          "name": "Rufus 启动盘制作",
+          "aliases": [
+            "rufus",
+            "启动盘",
+            "重装系统",
+            "iso"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "U盘启动",
+          "description": "小巧快速的 Windows/Linux ISO 系统安装启动 U 盘制作工具（支持绕过 TPM/Win11 限制）。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/rufus",
+          "rel_entry_path": "tools/其他工具/rufus/rufus.exe",
+          "variants": [
+            {
+              "Label": "rufus.exe",
+              "Path": "tools/其他工具/rufus/rufus.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "rufus.exe",
+              "IsDir": false,
+              "Size": 1380408
+            }
+          ],
+          "total_bytes": 1380408,
+          "file_count": 1
+        },
+        {
+          "id": "ventoy",
+          "name": "Ventoy 多系统启动盘",
+          "aliases": [
+            "ventoy",
+            "多系统",
+            "iso直启"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "多ISO启动",
+          "description": "制作后只需直接把多个 ISO/WIM/VHD 镜像拷入 U 盘即可菜单直启，装机维修利器。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/ventoy",
+          "rel_entry_path": "tools/其他工具/ventoy/Ventoy2Disk.exe",
+          "variants": [
+            {
+              "Label": "Ventoy2Disk.exe",
+              "Path": "tools/其他工具/ventoy/Ventoy2Disk.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "VentoyPlugson.exe",
+              "Path": "tools/其他工具/ventoy/VentoyPlugson.exe",
+              "Kind": "exe"
+            },
+            {
+              "Label": "VentoyVlnk.exe",
+              "Path": "tools/其他工具/ventoy/VentoyVlnk.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "altexe",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "boot",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "plugin",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "ventoy",
+              "IsDir": true,
+              "Size": 0
+            },
+            {
+              "Name": "log.txt",
+              "IsDir": false,
+              "Size": 134278
+            },
+            {
+              "Name": "Ventoy2Disk.exe",
+              "IsDir": false,
+              "Size": 397824
+            },
+            {
+              "Name": "Ventoy2Disk.ini",
+              "IsDir": false,
+              "Size": 154
+            },
+            {
+              "Name": "VentoyPlugson.exe",
+              "IsDir": false,
+              "Size": 365568
+            },
+            {
+              "Name": "VentoyVlnk.exe",
+              "IsDir": false,
+              "Size": 151552
+            }
+          ],
+          "total_bytes": 17317939,
+          "file_count": 44
+        },
+        {
+          "id": "desktopok",
+          "name": "DesktopOK 图标布局保存",
+          "aliases": [
+            "desktopok",
+            "桌面图标"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "图标备份",
+          "description": "一键备份与恢复 Windows 桌面图标位置，防止改分辨率或装驱动后桌面图标乱序。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/DesktopOK",
+          "rel_entry_path": "tools/其他工具/DesktopOK/DesktopOK.exe",
+          "variants": [
+            {
+              "Label": "DesktopOK.exe",
+              "Path": "tools/其他工具/DesktopOK/DesktopOK.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "DesktopOK.exe",
+              "IsDir": false,
+              "Size": 753904
+            }
+          ],
+          "total_bytes": 753904,
+          "file_count": 1
+        },
+        {
+          "id": "gifcam",
+          "name": "GifCam 动图录制",
+          "aliases": [
+            "gifcam",
+            "gif",
+            "录屏"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "GIF录屏",
+          "description": "极轻量的桌面区域 GIF 动图录制与逐帧编辑小工具。",
+          "kind": "exe",
+          "rel_dir": "tools/其他工具/gifcam",
+          "rel_entry_path": "tools/其他工具/gifcam/GifCam.exe",
+          "variants": [
+            {
+              "Label": "GifCam.exe",
+              "Path": "tools/其他工具/gifcam/GifCam.exe",
+              "Kind": "exe"
+            }
+          ],
+          "files": [
+            {
+              "Name": "GifCam.exe",
+              "IsDir": false,
+              "Size": 1662464
+            }
+          ],
+          "total_bytes": 1662464,
+          "file_count": 1
+        },
+        {
+          "id": "batteryinfoview",
+          "name": "BatteryInfoView 电池损耗",
+          "aliases": [
+            "battery",
+            "电池",
+            "损耗",
+            "笔记本"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "加密压缩",
+          "description": "查看笔记本电池设计容量、当前充满容量、损耗度、充放电功率与循环次数。",
+          "warning": "压缩包已加密（解压密码请查看右侧密码提示与目录声明）。",
+          "kind": "archive",
+          "rel_dir": "tools/其他工具/BatteryInfoView",
+          "rel_entry_path": "tools/其他工具/BatteryInfoView/BatteryInfoView.zip",
+          "variants": [
+            {
+              "Label": "BatteryInfoView.zip",
+              "Path": "tools/其他工具/BatteryInfoView/BatteryInfoView.zip",
+              "Kind": "archive"
+            }
+          ],
+          "password_note": "解压密码：tulading",
+          "files": [
+            {
+              "Name": "BatteryInfoView.zip",
+              "IsDir": false,
+              "Size": 59350
+            },
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 263
+            },
+            {
+              "Name": "解压密码.txt",
+              "IsDir": false,
+              "Size": 23
+            }
+          ],
+          "total_bytes": 59636,
+          "file_count": 3
+        },
+        {
+          "id": "chipgenius",
+          "name": "ChipGenius 主控芯片检测",
+          "aliases": [
+            "chipgenius",
+            "u盘主控",
+            "usb"
+          ],
+          "category_id": "other",
+          "category_name": "其他工具",
+          "tag": "加密压缩",
+          "description": "精准识别 U 盘主控型号、闪存 Flash 颗粒厂商与 USB 设备 VID/PID。",
+          "warning": "压缩包已加密（解压密码请查看右侧密码提示与目录声明）。",
+          "kind": "archive",
+          "rel_dir": "tools/其他工具/ChipGenius",
+          "rel_entry_path": "tools/其他工具/ChipGenius/chipgenius.zip",
+          "variants": [
+            {
+              "Label": "chipgenius.zip",
+              "Path": "tools/其他工具/ChipGenius/chipgenius.zip",
+              "Kind": "archive"
+            }
+          ],
+          "password_note": "解压密码：tulading",
+          "files": [
+            {
+              "Name": "chipgenius.zip",
+              "IsDir": false,
+              "Size": 324540
+            },
+            {
+              "Name": "安全与免责声明.txt",
+              "IsDir": false,
+              "Size": 260
+            },
+            {
+              "Name": "解压密码.txt",
+              "IsDir": false,
+              "Size": 23
+            }
+          ],
+          "total_bytes": 324823,
+          "file_count": 3
+        }
+      ]
+    }
+  ]
+}

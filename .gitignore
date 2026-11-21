@@ -1,0 +1,10 @@
+/target
+*.log
+*.bak
+*.tmp
+硬件配置报告.txt
+
+/tools/*
+!/tools/DISCLAIMER.md
+/*.exe
+*.zip
