@@ -52,69 +52,65 @@ pub fn extract_exe_hicon(exe_path: &Path, size: i32) -> Option<OwnedIcon> {
     Some(OwnedIcon(hicon))
 }
 
-/// Generates a 64x64 rounded Fluent Light window/taskbar icon as raw RGBA bytes.
-pub fn synthesize_app_window_icon_rgba() -> (u32, u32, Vec<u8>) {
-    const S: u32 = 64;
-    let mut buf = vec![0u8; (S * S * 4) as usize];
+fn sdf_round_box(u: f32, v: f32, cx: f32, cy: f32, hw: f32, hh: f32, r: f32) -> f32 {
+    let dx = (u - cx).abs() - (hw - r);
+    let dy = (v - cy).abs() - (hh - r);
+    dx.max(0.0).hypot(dy.max(0.0)) + dx.max(dy).min(0.0) - r
+}
 
-    let fill_rect = |b: &mut [u8], x0: i32, y0: i32, x1: i32, y1: i32, col: [u8; 4]| {
-        for y in y0.max(0)..y1.min(S as i32) {
-            for x in x0.max(0)..x1.min(S as i32) {
-                let idx = ((y as u32 * S + x as u32) * 4) as usize;
-                b[idx..idx + 4].copy_from_slice(&col);
-            }
-        }
-    };
-    let stroke_rect =
-        |b: &mut [u8], x0: i32, y0: i32, x1: i32, y1: i32, t: i32, col: [u8; 4]| {
-            fill_rect(b, x0, y0, x1, y0 + t, col);
-            fill_rect(b, x0, y1 - t, x1, y1, col);
-            fill_rect(b, x0, y0, x0 + t, y1, col);
-            fill_rect(b, x1 - t, y0, x1, y1, col);
-        };
+/// Generates a square RGBA app icon (mineral sage-teal tile + symmetric 2x2 warm-ivory grid).
+pub fn synthesize_app_window_icon_rgba_sized(size: u32) -> (u32, u32, Vec<u8>) {
+    let s = size.max(16);
+    let mut buf = vec![0u8; (s * s * 4) as usize];
+    let (bg_r, bg_g, bg_b) = (45.0f32, 110.0f32, 92.0f32); // #2D6E5C
+    let (fg_r, fg_g, fg_b) = (250.0f32, 248.0f32, 243.0f32); // #FAF8F3
+    const SS: usize = 8;
+    let inv_ss = 1.0 / SS as f32;
+    let inv_s = 1.0 / s as f32;
+    let px_scale = s as f32;
 
-    for y in 0..S {
-        for x in 0..S {
-            let dx = if x < 12 {
-                12 - x as i32
-            } else if x >= S - 12 {
-                x as i32 - (S as i32 - 13)
-            } else {
-                0
-            };
-            let dy = if y < 12 {
-                12 - y as i32
-            } else if y >= S - 12 {
-                y as i32 - (S as i32 - 13)
-            } else {
-                0
-            };
-            let dist_sq = dx * dx + dy * dy;
-            if dist_sq > 12 * 12 {
-                continue;
+    for py in 0..s {
+        for px in 0..s {
+            let mut sum_bg = 0.0f32;
+            let mut sum_fg = 0.0f32;
+            for sy in 0..SS {
+                let v = (py as f32 + (sy as f32 + 0.5) * inv_ss) * inv_s;
+                for sx in 0..SS {
+                    let u = (px as f32 + (sx as f32 + 0.5) * inv_ss) * inv_s;
+                    let d_bg = sdf_round_box(u, v, 0.5, 0.5, 0.465, 0.465, 0.235);
+                    let cov_bg = (0.5 - d_bg * px_scale).clamp(0.0, 1.0);
+                    if cov_bg > 0.0 {
+                        sum_bg += cov_bg;
+                        let d_tl = sdf_round_box(u, v, 0.3515, 0.3515, 0.1165, 0.1165, 0.034);
+                        let d_tr = sdf_round_box(u, v, 0.6485, 0.3515, 0.1165, 0.1165, 0.034);
+                        let d_bl = sdf_round_box(u, v, 0.3515, 0.6485, 0.1165, 0.1165, 0.034);
+                        let d_br = sdf_round_box(u, v, 0.6485, 0.6485, 0.1165, 0.1165, 0.034);
+                        let d_fg = d_tl.min(d_tr).min(d_bl).min(d_br);
+                        let cov_fg = (0.5 - d_fg * px_scale).clamp(0.0, 1.0);
+                        sum_fg += cov_bg.min(cov_fg);
+                    }
+                }
             }
-            let idx = ((y * S + x) * 4) as usize;
-            let border = x < 2 || x >= S - 2 || y < 2 || y >= S - 2 || dist_sq >= 10 * 10;
-            if border {
-                buf[idx..idx + 4].copy_from_slice(&[29, 78, 216, 255]);
-            } else {
-                buf[idx..idx + 4].copy_from_slice(&[37, 99, 235, 255]);
+            let n = (SS * SS) as f32;
+            let a_bg = sum_bg / n;
+            let a_fg = sum_fg / n;
+            let idx = ((py * s + px) * 4) as usize;
+            if a_bg > 0.002 {
+                let t = (a_fg / a_bg).clamp(0.0, 1.0);
+                buf[idx] = (bg_r * (1.0 - t) + fg_r * t).round().clamp(0.0, 255.0) as u8;
+                buf[idx + 1] = (bg_g * (1.0 - t) + fg_g * t).round().clamp(0.0, 255.0) as u8;
+                buf[idx + 2] = (bg_b * (1.0 - t) + fg_b * t).round().clamp(0.0, 255.0) as u8;
+                buf[idx + 3] = (a_bg * 255.0).round().clamp(0.0, 255.0) as u8;
             }
         }
     }
+    (s, s, buf)
+}
 
-    for pin in [20, 28, 36, 44] {
-        fill_rect(&mut buf, pin - 1, 13, pin + 2, 18, [255, 255, 255, 255]);
-        fill_rect(&mut buf, pin - 1, 46, pin + 2, 51, [255, 255, 255, 255]);
-        fill_rect(&mut buf, 13, pin - 1, 18, pin + 2, [255, 255, 255, 255]);
-        fill_rect(&mut buf, 46, pin - 1, 51, pin + 2, [255, 255, 255, 255]);
-    }
-    fill_rect(&mut buf, 19, 19, 45, 45, [29, 78, 216, 255]);
-    stroke_rect(&mut buf, 19, 19, 45, 45, 2, [255, 255, 255, 255]);
-    fill_rect(&mut buf, 24, 25, 40, 29, [255, 255, 255, 255]);
-    fill_rect(&mut buf, 30, 29, 34, 40, [219, 234, 254, 255]);
-
-    (S, S, buf)
+/// Generates a 64x64 rounded window/taskbar icon RGBA buffer (palette-independent brand icon).
+#[allow(dead_code)]
+pub fn synthesize_app_window_icon_rgba(_theme: &crate::gdi::ThemePalette) -> (u32, u32, Vec<u8>) {
+    synthesize_app_window_icon_rgba_sized(64)
 }
 
 fn tool_icon_candidates(tool: &Tool) -> Vec<PathBuf> {
@@ -469,9 +465,36 @@ mod tests {
 
     #[test]
     fn gdi_bitmap_from_rgba_creates_valid_handle() {
-        let (w, h, rgba) = synthesize_app_window_icon_rgba();
+        let (w, h, rgba) = synthesize_app_window_icon_rgba(&crate::gdi::THEME);
         let bmp = GdiBitmap::from_rgba(w, h, &rgba).expect("create GdiBitmap");
         assert_eq!(bmp.width, w);
         assert_eq!(bmp.height, h);
+        // Corners must be transparent
+        assert_eq!(rgba[3], 0);
+        // Dead center (0.5, 0.5) cross-channel must be mineral sage-teal (#2D6E5C)
+        let cx = (w / 2) as usize;
+        let cy = (h / 2) as usize;
+        let c_idx = (cy * w as usize + cx) * 4;
+        assert_eq!(&rgba[c_idx..c_idx + 4], &[45, 110, 92, 255]);
+        // Top-left tile center (0.3515, 0.3515) must be warm ivory (#FAF8F3)
+        let tx = (w as f32 * 0.3515).round() as usize;
+        let ty = (h as f32 * 0.3515).round() as usize;
+        let t_idx = (ty * w as usize + tx) * 4;
+        assert_eq!(&rgba[t_idx..t_idx + 4], &[250, 248, 243, 255]);
+    }
+
+    #[test]
+    fn embedded_ico_file_valid_multiresolution() {
+        let ico_path = workspace_root().join("assets/app_icon.ico");
+        let bytes = std::fs::read(&ico_path).expect("assets/app_icon.ico missing");
+        assert!(bytes.len() > 6 + 16 * 7);
+        assert_eq!(&bytes[0..6], &[0, 0, 1, 0, 7, 0]);
+        let mut widths = Vec::new();
+        for i in 0..7 {
+            let entry = &bytes[6 + i * 16..6 + (i + 1) * 16];
+            let w = if entry[0] == 0 { 256u32 } else { entry[0] as u32 };
+            widths.push(w);
+        }
+        assert_eq!(widths, vec![16, 24, 32, 48, 64, 128, 256]);
     }
 }

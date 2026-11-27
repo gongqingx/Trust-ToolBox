@@ -1,6 +1,6 @@
 use crate::catalog::{Catalog, Tool, extract_password};
 use crate::config::Config;
-use crate::gdi::{Rect, Rgb, theme};
+use crate::gdi::{Rect, THEME, ThemePalette};
 use crate::hwinfo::{HardwareReport, format_plain_text, parse_hwinfo, shorten_model_name};
 use crate::icons::{
     IconCache, IconJob, PreviewImageCache, decode_image_preview_gdi, extract_icon_job_raw,
@@ -53,7 +53,6 @@ pub enum ScrollTarget {
 pub enum HitAction {
     FocusSearch,
     ClearSearch,
-    OpenPinnedView,
     TogglePreview,
     OpenHelp,
     FocusPanel(FocusPanel),
@@ -123,11 +122,18 @@ pub struct SidebarEntry {
     pub selected: bool,
 }
 
-pub struct HwCard {
-    pub title: &'static str,
+pub struct HwSummaryItem {
     pub icon_key: &'static str,
-    pub tag: String,
-    pub rows: Vec<(&'static str, String)>,
+    pub title: &'static str,
+    pub primary: String,
+    pub secondary: String,
+}
+
+pub struct HwSpecRow {
+    pub icon_key: Option<&'static str>,
+    pub label: String,
+    pub value: String,
+    pub group_start: bool,
 }
 
 pub fn category_icon_key(id: &str) -> &'static str {
@@ -142,13 +148,12 @@ pub fn category_icon_key(id: &str) -> &'static str {
         "burn" => "burn",
         "periph" => "periph",
         "other" => "other",
-        "common" => "common",
         _ => "folder",
     }
 }
 
-pub fn tool_kind_badge(tool: &Tool) -> (&'static str, Rgb, Rgb) {
-    let label = match tool.kind.as_str() {
+pub fn tool_kind_label(tool: &Tool) -> &'static str {
+    match tool.kind.as_str() {
         "bat" => "BAT",
         "archive" => "ZIP",
         "img" => "IMG",
@@ -164,8 +169,7 @@ pub fn tool_kind_badge(tool: &Tool) -> (&'static str, Rgb, Rgb) {
                 "EXE"
             }
         }
-    };
-    (label, theme::TEXT_SLATE, theme::PILL_BG)
+    }
 }
 
 pub fn sort_label(mode: &str) -> &'static str {
@@ -576,204 +580,468 @@ impl AppState {
         out
     }
 
-    pub fn header_hw_summary(&self) -> String {
-        let cpu_short = shorten_model_name(&self.hw.cpu_model, 16);
-        let gpu_short = self
-            .hw
-            .gpus
-            .first()
-            .map(|g| shorten_model_name(&g.model, 16))
-            .unwrap_or_default();
-        let mut parts = Vec::new();
-        if !cpu_short.is_empty() {
-            parts.push(cpu_short);
-        }
-        if !gpu_short.is_empty() {
-            parts.push(gpu_short);
-        }
-        let mem_total = self.hw.total_memory_gb();
-        if !mem_total.is_empty() {
-            parts.push(mem_total);
-        }
-        parts.join(" / ")
-    }
-
-    pub fn footer_hw_meta(&self) -> (String, String, &'static str, String) {
-        let cpu_meta = if !self.hw.cpu_cores.is_empty() && !self.hw.cpu_threads.is_empty() {
-            format!(
-                "{} ({}C/{}T)",
-                shorten_model_name(&self.hw.cpu_model, 22),
-                self.hw.cpu_cores,
-                self.hw.cpu_threads
-            )
-        } else {
-            self.hw.cpu_model.clone()
-        };
-        let mem_total = self.hw.total_memory_gb();
-        let mut gpu_meta = self
-            .hw
-            .gpus
-            .first()
-            .map(|g| {
-                let mut s = shorten_model_name(&g.model, 18);
-                if !g.vram.is_empty() {
-                    s.push(' ');
-                    s.push_str(&g.vram);
-                }
-                s
-            })
-            .unwrap_or_else(|| "未记录显卡".to_string());
-        if !mem_total.is_empty() {
-            gpu_meta.push_str(" · RAM ");
-            gpu_meta.push_str(&mem_total);
-        }
-        if let Some(tool) = self.selected_tool() {
-            let entry_txt = if tool.kind == "tui" {
-                "内置屏幕测试模块".to_string()
-            } else {
-                let base = tool
-                    .entry_path
-                    .file_name()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or("");
-                format!("{} ({})", base, crate::catalog::format_bytes(tool.total_bytes))
-            };
-            (cpu_meta, gpu_meta, "入口:", entry_txt)
-        } else {
-            let os_short = self.hw.os_name.trim_start_matches("Microsoft ");
-            (
-                cpu_meta,
-                gpu_meta,
-                "系统:",
-                format!("{} ({})", os_short, self.hw.os_build),
-            )
-        }
-    }
-
-    pub fn build_hw_cards(&self) -> Vec<HwCard> {
+    pub fn build_hw_summary(&self) -> [HwSummaryItem; 4] {
         let rep = &self.hw;
-        let kv = |k: &'static str, v: &str| -> (&'static str, String) {
-            let val = if v.trim().is_empty() { "-" } else { v.trim() };
-            (k, val.to_string())
+
+        let cpu_primary = if rep.cpu_model.trim().is_empty() {
+            "未检测到".to_string()
+        } else {
+            shorten_model_name(&rep.cpu_model, 24)
+        };
+        let mut cpu_sec_parts = Vec::new();
+        if !rep.cpu_cores.trim().is_empty() || !rep.cpu_threads.trim().is_empty() {
+            cpu_sec_parts.push(format!(
+                "{}核 {}线程",
+                non_empty(&rep.cpu_cores, "?"),
+                non_empty(&rep.cpu_threads, "?")
+            ));
+        }
+        if !rep.cpu_clock.trim().is_empty() {
+            cpu_sec_parts.push(rep.cpu_clock.trim().to_string());
+        }
+        let cpu_secondary = if cpu_sec_parts.is_empty() {
+            "规格未知".to_string()
+        } else {
+            cpu_sec_parts.join(" · ")
         };
 
-        let sys_rows = vec![
-            kv("系统", &format!("{} ({})", rep.os_name, rep.os_arch)),
-            kv("机型", format!("{} {}", rep.system_vendor, rep.system_model).trim()),
-            kv("主板", format!("{} {}", rep.board_brand, rep.board_model).trim()),
-            kv("BIOS", format!("{} {}", rep.bios_vendor, rep.bios_version).trim()),
-        ];
+        let (gpu_primary, gpu_secondary) = if let Some(g) = rep.gpus.first() {
+            let p = if g.model.trim().is_empty() {
+                "未检测到".to_string()
+            } else {
+                shorten_model_name(&g.model, 24)
+            };
+            let mut sec = Vec::new();
+            if !g.vram.trim().is_empty() {
+                sec.push(format!("显存 {}", g.vram.trim()));
+            }
+            if rep.gpus.len() > 1 {
+                sec.push(format!("共 {} 张", rep.gpus.len()));
+            }
+            let s = if sec.is_empty() {
+                "显示适配器".to_string()
+            } else {
+                sec.join(" · ")
+            };
+            (p, s)
+        } else {
+            ("未检测到".to_string(), "显示适配器".to_string())
+        };
 
-        let cpu_rows = vec![
-            kv("型号", &rep.cpu_model),
-            kv(
-                "规格",
-                &format!(
-                    "{}核心 {}线程 | {}",
-                    non_empty(&rep.cpu_cores, "?"),
-                    non_empty(&rep.cpu_threads, "?"),
-                    non_empty(&rep.cpu_clock, "?")
-                ),
-            ),
-            kv(
-                "接口",
-                &format!(
-                    "{} | 外频 {}",
-                    non_empty(&rep.cpu_socket, "-"),
-                    non_empty(&rep.cpu_bclk, "-")
-                ),
-            ),
-            kv("芯片组", non_empty(&rep.chipset_desc, &rep.chipset_model)),
-        ];
-
-        let mut gpu_rows = Vec::new();
-        for g in &rep.gpus {
-            gpu_rows.push(kv(
-                "显卡",
-                format!("{} {}", g.model, paren(&g.vram)).trim(),
-            ));
-            if !g.driver_version.is_empty() {
-                gpu_rows.push(kv("驱动", &g.driver_version));
+        let total_mem = rep.total_memory_gb();
+        let mem_primary = if total_mem.is_empty() && rep.memory_type.trim().is_empty() {
+            "未检测到".to_string()
+        } else {
+            format!("{} {}", total_mem, rep.memory_type.trim())
+                .trim()
+                .to_string()
+        };
+        let mut mem_sec = Vec::new();
+        if !rep.memory_modules.is_empty() {
+            mem_sec.push(format!("{} 条插槽", rep.memory_modules.len()));
+            if let Some(spd) = rep
+                .memory_modules
+                .iter()
+                .map(|m| m.speed.trim())
+                .find(|s| !s.is_empty())
+            {
+                mem_sec.push(spd.to_string());
             }
         }
-        if gpu_rows.is_empty() {
-            gpu_rows.push(kv("显卡", "未检测到"));
-        }
-        for mon in &rep.monitors {
-            gpu_rows.push(kv("屏幕", &format!("{} {}", mon.model, mon.size)));
-        }
+        let mem_secondary = if mem_sec.is_empty() {
+            "物理内存".to_string()
+        } else {
+            mem_sec.join(" · ")
+        };
 
-        let mut mem_rows = Vec::new();
-        for mm in &rep.memory_modules {
-            mem_rows.push(kv(
-                "内存条",
-                &format!("#{} {} {} {}", mm.index, mm.capacity, mm.speed, mm.manufacturer),
-            ));
-            if !mm.part_number.is_empty() {
-                mem_rows.push(kv("颗粒/号", &mm.part_number));
-            }
+        let os_primary = if rep.os_name.trim().is_empty() {
+            "未检测到".to_string()
+        } else {
+            rep.os_name.trim().to_string()
+        };
+        let mut os_sec = Vec::new();
+        if !rep.os_build.trim().is_empty() {
+            os_sec.push(format!("Build {}", rep.os_build.trim()));
         }
-        if mem_rows.is_empty() {
-            mem_rows.push(kv("内存", "未检测到"));
+        if !rep.os_arch.trim().is_empty() {
+            os_sec.push(rep.os_arch.trim().to_string());
         }
+        let os_secondary = if os_sec.is_empty() {
+            "操作系统".to_string()
+        } else {
+            os_sec.join(" · ")
+        };
 
-        let mut disk_rows = Vec::new();
-        for d in &rep.disks {
-            disk_rows.push(kv(
-                "硬盘",
-                &format!("#{} {} ({} {})", d.index, d.model, d.capacity, d.bus_type),
-            ));
-        }
-        if disk_rows.is_empty() {
-            disk_rows.push(kv("硬盘", "未检测到"));
-        }
-
-        let mut net_rows = Vec::new();
-        for (i, a) in rep.audio_devices.iter().take(2).enumerate() {
-            net_rows.push(kv(if i == 0 { "声卡1" } else { "声卡2" }, a));
-        }
-        for n in rep.net_adapters.iter().take(2) {
-            net_rows.push(kv("网卡", &format!("#{} {} ({})", n.index, n.model, n.speed)));
-        }
-
-        vec![
-            HwCard {
-                title: "系统与主板",
-                icon_key: "mobo",
-                tag: non_empty(&rep.system_type, "PC").to_string(),
-                rows: sys_rows,
-            },
-            HwCard {
-                title: "处理器架构",
+        [
+            HwSummaryItem {
                 icon_key: "cpu",
-                tag: non_empty(&rep.cpu_vendor, "CPU").to_string(),
-                rows: cpu_rows,
+                title: "处理器",
+                primary: cpu_primary,
+                secondary: cpu_secondary,
             },
-            HwCard {
-                title: "显卡与显示",
+            HwSummaryItem {
                 icon_key: "gpu",
-                tag: format!("{} 显卡", rep.gpus.len()),
-                rows: gpu_rows,
+                title: "显卡",
+                primary: gpu_primary,
+                secondary: gpu_secondary,
             },
-            HwCard {
-                title: "内存插槽",
+            HwSummaryItem {
                 icon_key: "ram",
-                tag: format!("{} 条", rep.memory_modules.len()),
-                rows: mem_rows,
+                title: "内存",
+                primary: mem_primary,
+                secondary: mem_secondary,
             },
-            HwCard {
-                title: "物理存储",
-                icon_key: "disk",
-                tag: format!("{} 块", rep.disks.len()),
-                rows: disk_rows,
-            },
-            HwCard {
-                title: "声卡与网络",
-                icon_key: "web",
-                tag: format!("{} 网卡", rep.net_adapters.len()),
-                rows: net_rows,
+            HwSummaryItem {
+                icon_key: "overview",
+                title: "系统",
+                primary: os_primary,
+                secondary: os_secondary,
             },
         ]
+    }
+
+    pub fn build_hw_rows(&self) -> Vec<HwSpecRow> {
+        let rep = &self.hw;
+        fn join_dots(parts: Vec<String>) -> String {
+            let filtered: Vec<String> = parts
+                .into_iter()
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+            if filtered.is_empty() {
+                "未检测到".to_string()
+            } else {
+                filtered.join(" · ")
+            }
+        }
+        fn push_row(
+            rows: &mut Vec<HwSpecRow>,
+            icon_key: Option<&'static str>,
+            group_start: bool,
+            label: impl Into<String>,
+            value: String,
+        ) {
+            rows.push(HwSpecRow {
+                icon_key,
+                label: label.into(),
+                value,
+                group_start,
+            });
+        }
+
+        let mut rows = Vec::new();
+
+        // 1. 操作系统
+        let os_build = if rep.os_build.trim().is_empty() {
+            String::new()
+        } else {
+            format!("Build {}", rep.os_build.trim())
+        };
+        push_row(
+            &mut rows,
+            Some("overview"),
+            false,
+            "操作系统",
+            join_dots(vec![rep.os_name.clone(), os_build, rep.os_arch.clone()]),
+        );
+
+        // 2. 整机 / 主板 / BIOS
+        let sys_model = format!("{} {}", rep.system_vendor.trim(), rep.system_model.trim())
+            .trim()
+            .to_string();
+        let sys_full = format!("{sys_model} {}", paren(&rep.system_type))
+            .trim()
+            .to_string();
+        push_row(
+            &mut rows,
+            Some("mobo"),
+            true,
+            "整机型号",
+            join_dots(vec![sys_full]),
+        );
+
+        let board = format!("{} {}", rep.board_brand.trim(), rep.board_model.trim())
+            .trim()
+            .to_string();
+        let chipset_name = non_empty(&rep.chipset_desc, &rep.chipset_model).trim().to_string();
+        let chipset = if chipset_name.is_empty() {
+            String::new()
+        } else if rep.chipset_step.trim().is_empty() {
+            chipset_name
+        } else {
+            format!("{chipset_name} (步进 {})", rep.chipset_step.trim())
+        };
+        push_row(
+            &mut rows,
+            None,
+            false,
+            "主板芯片",
+            join_dots(vec![board, chipset]),
+        );
+
+        let bios_ver = if rep.bios_version.trim().is_empty() {
+            String::new()
+        } else {
+            format!("版本 {}", rep.bios_version.trim())
+        };
+        let bios_oem = rep.bios_oem.trim();
+        let bios_oem_part = if !bios_oem.is_empty()
+            && bios_oem != rep.bios_vendor.trim()
+            && bios_oem != rep.bios_version.trim()
+        {
+            bios_oem.to_string()
+        } else {
+            String::new()
+        };
+        push_row(
+            &mut rows,
+            None,
+            false,
+            "BIOS 固件",
+            join_dots(vec![rep.bios_vendor.clone(), bios_ver, bios_oem_part]),
+        );
+
+        // 3. 处理器
+        let cores_threads = if rep.cpu_cores.trim().is_empty() && rep.cpu_threads.trim().is_empty() {
+            String::new()
+        } else {
+            format!(
+                "{}核心 {}线程",
+                non_empty(&rep.cpu_cores, "?"),
+                non_empty(&rep.cpu_threads, "?")
+            )
+        };
+        let cpu_clock = if rep.cpu_clock.trim().is_empty() {
+            String::new()
+        } else {
+            format!("主频 {}", rep.cpu_clock.trim())
+        };
+        let cpu_bclk = if rep.cpu_bclk.trim().is_empty() {
+            String::new()
+        } else {
+            format!("外频 {}", rep.cpu_bclk.trim())
+        };
+        push_row(
+            &mut rows,
+            Some("cpu"),
+            true,
+            "处理器",
+            join_dots(vec![
+                rep.cpu_model.clone(),
+                cores_threads,
+                cpu_clock,
+                cpu_bclk,
+                rep.cpu_socket.clone(),
+            ]),
+        );
+
+        // 4. 物理内存
+        let format_mem = |mm: &crate::hwinfo::MemoryModule| -> String {
+            let part = if mm.part_number.trim().is_empty() {
+                String::new()
+            } else {
+                format!("型号 {}", mm.part_number.trim())
+            };
+            let sn = mm.serial.trim();
+            let sn_part = if !sn.is_empty() && sn != "未知" {
+                format!("SN {sn}")
+            } else {
+                String::new()
+            };
+            join_dots(vec![
+                mm.capacity.clone(),
+                rep.memory_type.clone(),
+                mm.speed.clone(),
+                mm.manufacturer.clone(),
+                part,
+                sn_part,
+            ])
+        };
+        if rep.memory_modules.is_empty() {
+            push_row(&mut rows, Some("ram"), true, "物理内存", "未检测到".to_string());
+        } else if rep.memory_modules.len() == 1 {
+            push_row(
+                &mut rows,
+                Some("ram"),
+                true,
+                "物理内存",
+                format_mem(&rep.memory_modules[0]),
+            );
+        } else {
+            let total = rep.total_memory_gb();
+            let sum_head = format!("共 {} {}", non_empty(&total, "?"), rep.memory_type.trim())
+                .trim()
+                .to_string();
+            let slots_txt = format!("{} 条插槽", rep.memory_modules.len());
+            push_row(
+                &mut rows,
+                Some("ram"),
+                true,
+                "物理内存",
+                join_dots(vec![sum_head, slots_txt]),
+            );
+            for mm in &rep.memory_modules {
+                push_row(
+                    &mut rows,
+                    None,
+                    false,
+                    format!("内存插槽 #{}", mm.index),
+                    format_mem(mm),
+                );
+            }
+        }
+
+        // 5. 显卡
+        if rep.gpus.is_empty() {
+            push_row(&mut rows, Some("gpu"), true, "显卡", "未检测到".to_string());
+        } else {
+            let multi = rep.gpus.len() > 1;
+            for (idx, g) in rep.gpus.iter().enumerate() {
+                let lbl = if multi {
+                    format!("显卡 #{}", g.index)
+                } else {
+                    "显卡".to_string()
+                };
+                let vram = if g.vram.trim().is_empty() {
+                    String::new()
+                } else {
+                    format!("显存 {}", g.vram.trim())
+                };
+                let drv = if g.driver_version.trim().is_empty() {
+                    String::new()
+                } else {
+                    format!("驱动 {}", g.driver_version.trim())
+                };
+                let step = if g.stepping.trim().is_empty() {
+                    String::new()
+                } else {
+                    format!("步进 {}", g.stepping.trim())
+                };
+                push_row(
+                    &mut rows,
+                    if idx == 0 { Some("gpu") } else { None },
+                    idx == 0,
+                    lbl,
+                    join_dots(vec![g.model.clone(), vram, drv, step]),
+                );
+            }
+        }
+
+        // 6. 显示器
+        if rep.monitors.is_empty() {
+            push_row(&mut rows, Some("screen"), true, "显示器", "未检测到".to_string());
+        } else {
+            let multi = rep.monitors.len() > 1;
+            for (idx, m) in rep.monitors.iter().enumerate() {
+                let lbl = if multi {
+                    format!("显示器 #{}", m.index)
+                } else {
+                    "显示器".to_string()
+                };
+                let name_part = format!("{} {}", m.model.trim(), paren(&m.id))
+                    .trim()
+                    .to_string();
+                let sz = m.size.trim();
+                let dims = m.dimensions.trim();
+                let size_part = if !sz.is_empty() && !dims.is_empty() {
+                    format!("{sz} ({dims})")
+                } else if !sz.is_empty() {
+                    sz.to_string()
+                } else {
+                    dims.to_string()
+                };
+                push_row(
+                    &mut rows,
+                    if idx == 0 { Some("screen") } else { None },
+                    idx == 0,
+                    lbl,
+                    join_dots(vec![name_part, size_part, m.manufacture.clone()]),
+                );
+            }
+        }
+
+        // 7. 物理硬盘
+        if rep.disks.is_empty() {
+            push_row(&mut rows, Some("disk"), true, "物理硬盘", "未检测到".to_string());
+        } else {
+            let multi = rep.disks.len() > 1;
+            for (idx, d) in rep.disks.iter().enumerate() {
+                let lbl = if multi {
+                    format!("硬盘 #{}", d.index)
+                } else {
+                    "物理硬盘".to_string()
+                };
+                let cap = d.capacity.trim();
+                let act = d.actual_size.trim();
+                let cap_part = if !cap.is_empty() && !act.is_empty() {
+                    format!("{cap} (实际 {act})")
+                } else if !cap.is_empty() {
+                    cap.to_string()
+                } else {
+                    act.to_string()
+                };
+                push_row(
+                    &mut rows,
+                    if idx == 0 { Some("disk") } else { None },
+                    idx == 0,
+                    lbl,
+                    join_dots(vec![d.model.clone(), cap_part, d.bus_type.clone()]),
+                );
+            }
+        }
+
+        // 8. 声卡音频
+        let audio_parts: Vec<String> = rep
+            .audio_devices
+            .iter()
+            .map(|a| a.trim().to_string())
+            .filter(|a| !a.is_empty())
+            .collect();
+        let audio_val = if audio_parts.is_empty() {
+            "未检测到".to_string()
+        } else {
+            audio_parts.join("  /  ")
+        };
+        push_row(&mut rows, Some("periph"), true, "声卡音频", audio_val);
+
+        // 9. 网络适配器
+        if rep.net_adapters.is_empty() {
+            push_row(
+                &mut rows,
+                Some("web"),
+                true,
+                "网络适配器",
+                "未检测到".to_string(),
+            );
+        } else {
+            let multi = rep.net_adapters.len() > 1;
+            for (idx, n) in rep.net_adapters.iter().enumerate() {
+                let lbl = if multi {
+                    format!("网卡 #{}", n.index)
+                } else {
+                    "网络适配器".to_string()
+                };
+                let mac_part = if n.mac.trim().is_empty() {
+                    String::new()
+                } else {
+                    format!("MAC {}", n.mac.trim())
+                };
+                push_row(
+                    &mut rows,
+                    if idx == 0 { Some("web") } else { None },
+                    idx == 0,
+                    lbl,
+                    join_dots(vec![
+                        n.model.clone(),
+                        n.adapter_type.clone(),
+                        n.speed.clone(),
+                        mac_part,
+                    ]),
+                );
+            }
+        }
+
+        rows
     }
 
     pub fn recompute_tools(&mut self) {
@@ -839,10 +1107,9 @@ impl AppState {
         let Some(vp) = self.last_frame.list_viewport_rect else {
             return;
         };
-        let row_step = (49.0 * logical_scale).round();
-        let expanded_h = (68.0 * logical_scale).round();
-        let top = self.selected_tool_idx as f32 * row_step;
-        let bottom = top + expanded_h;
+        let row_h = (54.0 * logical_scale).round().max(1.0);
+        let top = self.selected_tool_idx as f32 * row_h;
+        let bottom = top + row_h;
         let vp_h = vp.h.max(1) as f32;
         if top < self.scroll_list {
             self.scroll_list = top;
@@ -1092,6 +1359,10 @@ impl AppState {
         self.set_toast(format!("排序方式已切换为: {lbl}"), fx);
     }
 
+    pub fn theme(&self) -> &'static ThemePalette {
+        &THEME
+    }
+
     pub fn reload_hwinfo(&mut self, fx: &mut UiEffects) {
         match parse_hwinfo(&self.data_root) {
             Ok(rep) => {
@@ -1143,18 +1414,6 @@ impl AppState {
         match action {
             HitAction::FocusSearch => self.prepare_search(fx),
             HitAction::ClearSearch => self.clear_search(true, fx),
-            HitAction::OpenPinnedView => {
-                self.search_focused = false;
-                self.active_view = ActiveView::Pinned;
-                self.focus_panel = FocusPanel::Main;
-                self.selected_tool_idx = 0;
-                self.scroll_list = 0.0;
-                self.recompute_tools();
-                self.prefetch_visible_icons();
-                self.request_preview_for_selected();
-                fx.repaint = true;
-                fx.activity = true;
-            }
             HitAction::TogglePreview => {
                 self.cfg.show_preview = !self.cfg.show_preview;
                 let _ = self.cfg.save(&self.config_dir);

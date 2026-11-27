@@ -56,6 +56,12 @@ pub struct Tool {
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub password_note: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub scenarios: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub usage_steps: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub key_tips: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub files: Vec<FileEntry>,
     #[serde(default)]
     pub total_bytes: u64,
@@ -181,6 +187,66 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
         folder: "综合检测",
         specs: &[
             ToolSpec {
+                id: "aida64",
+                name: "AIDA64 Extreme",
+                aliases: &["aida64", "everest", "传感器", "单烤fpu", "内存延迟"],
+                folder: "综合检测/AIDA64",
+                entry: "aida64.exe",
+                kind: "exe",
+                tag: "全能检测",
+                description: "权威全能硬件规格识别、传感器温度电压监控、内存缓存跑分与系统稳定性单烤 FPU 工具。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "hwinfo",
+                name: "HWiNFO64",
+                aliases: &["hwinfo", "hwinfo64", "传感器", "温度", "功耗"],
+                folder: "综合检测/hwinfo",
+                entry: "HWiNFO64.exe",
+                kind: "exe",
+                tag: "专业监控",
+                description: "专业级硬件深度信息提取与高精度实时传感器监控工具，烤机压测必备温度功耗观测面板。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "hwmonitor",
+                name: "HWMonitor 温度电压监控",
+                aliases: &["hwmonitor", "cpuid", "温度监控", "风扇转速", "电压"],
+                folder: "综合检测/HWMonitor",
+                entry: "HWMonitor_x64.exe",
+                kind: "exe",
+                tag: "实时监控",
+                description: "CPUID 出品的树状硬件传感器实时监控工具，直观读取 CPU/GPU/主板各路核心温度、功耗、电压与风扇转速。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "occt",
+                name: "OCCT 电源/整机压测",
+                aliases: &["occt", "电源测试", "双烤", "vram", "linpack"],
+                folder: "综合检测/OCCT",
+                entry: "OCCT.exe",
+                kind: "exe",
+                tag: "整机压测",
+                description: "集 CPU、内存、显卡 3D、显存 VRAM 与电源 Power 极限负载于一体的全能稳定性诊断与错误侦测套件。",
+                warning: "Power 电源测试模式会让 CPU 与显卡同时满载，请提前确认电源额定功率与整机散热。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "speccy",
+                name: "Speccy 硬件概览",
+                aliases: &["speccy", "配置单", "概览"],
+                folder: "综合检测/speccy",
+                entry: "Speccy64.exe",
+                kind: "exe",
+                tag: "清爽概览",
+                description: "Piriform 出品的轻量级整机硬件配置清单与实时温度速览工具。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
                 id: "tulading_hw",
                 name: "图拉丁硬件检测",
                 aliases: &["图拉丁硬件检测", "硬件检测", "图吧检测"],
@@ -211,6 +277,18 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
         name: "CPU工具",
         folder: "处理器工具",
         specs: &[
+            ToolSpec {
+                id: "cpuz",
+                name: "CPU-Z",
+                aliases: &["cpuz", "cpu-z", "处理器", "步进", "主板", "spd"],
+                folder: "处理器工具/CPUZ",
+                entry: "cpuz64.exe",
+                kind: "exe",
+                tag: "权威识别",
+                description: "必备处理器识别基准工具，查看 CPU 规格步进、核心电压、主板 BIOS、内存双通道时序及单多核快测跑分。",
+                warning: "",
+                is_tui: false,
+            },
             ToolSpec {
                 id: "prime95_bat",
                 name: "Prime95 一键单烤",
@@ -321,6 +399,18 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
         folder: "内存工具",
         specs: &[
             ToolSpec {
+                id: "thaiphoon",
+                name: "Thaiphoon Burner (台风)",
+                aliases: &["thaiphoon", "台风", "颗粒", "spd", "bdie"],
+                folder: "内存工具/Thaiphoon",
+                entry: "Thaiphoon.exe",
+                kind: "exe",
+                tag: "颗粒识别",
+                description: "内存 SPD 芯片深度读取工具，精准鉴别三星 B-Die、海力士 A-Die/M-Die、镁光 E-Die 等原厂颗粒型号与制造周数。",
+                warning: "仅建议使用 Read 读取 SPD 信息；请勿随意改写（Write）内存 SPD 以免导致无法开机。",
+                is_tui: false,
+            },
+            ToolSpec {
                 id: "tm5",
                 name: "TestMem5 (TM5)",
                 aliases: &["tm5", "testmem5", "内存烤机", "超频测试"],
@@ -357,6 +447,30 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 is_tui: false,
             },
             ToolSpec {
+                id: "memtestpro",
+                name: "MemTestPro (加密压缩包)",
+                aliases: &["memtestpro", "hci", "内存烧机"],
+                folder: "内存工具/memtestpro",
+                entry: "memtestpro.zip",
+                kind: "archive",
+                tag: "加密压缩",
+                description: "基于 HCI MemTest 增强的多线程自动化内存错误排查工具（加密打包以防杀软误删）。",
+                warning: "压缩包已加密（解压密码请查看右侧密码提示，通常为 tulading）。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "ramdisk",
+                name: "魔方内存盘 (RAMDisk)",
+                aliases: &["ramdisk", "魔方内存盘", "虚拟磁盘"],
+                folder: "内存工具/魔方内存盘",
+                entry: "ramdisk.exe",
+                kind: "exe",
+                tag: "内存虚拟盘",
+                description: "将空闲物理内存划出一部分映射为超高速虚拟硬盘，适合存放浏览器缓存或临时编译目录。",
+                warning: "非持久化内存盘在断电或重启后数据会清空，请勿在其中直接存放未备份的重要文档。",
+                is_tui: false,
+            },
+            ToolSpec {
                 id: "mem_clean",
                 name: "内存整理 (加密压缩包)",
                 aliases: &["内存整理", "sunlight", "清理内存"],
@@ -375,6 +489,18 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
         name: "显卡工具",
         folder: "显卡工具",
         specs: &[
+            ToolSpec {
+                id: "gpuz",
+                name: "GPU-Z",
+                aliases: &["gpuz", "gpu-z", "显卡", "显存颗粒", "vbios", "体质"],
+                folder: "显卡工具/GPUZ",
+                entry: "GPUZ.exe",
+                kind: "exe",
+                tag: "权威识别",
+                description: "TechPowerUp 权威显卡识别与监控工具，精准检测核心代号、ROPs/流处理器、显存品牌、PCIe 通道速率、VBIOS 及实时传感器曲线。",
+                warning: "",
+                is_tui: false,
+            },
             ToolSpec {
                 id: "gpuinfo",
                 name: "GPUInfo (核心查看)",
@@ -491,6 +617,54 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 is_tui: false,
             },
             ToolSpec {
+                id: "hdtune",
+                name: "HD Tune Pro",
+                aliases: &["hdtune", "hd tune", "慢扫", "坏道", "机械硬盘"],
+                folder: "硬盘工具/HDTune",
+                entry: "HDTune.exe",
+                kind: "exe",
+                tag: "坏道慢扫",
+                description: "机械硬盘（HDD）基准读写曲线测试、S.M.A.R.T. 状态查看与全盘红绿块坏道扫描（错误扫描请勿勾选快速扫描）。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "diskgenius",
+                name: "DiskGenius 分区与恢复",
+                aliases: &["diskgenius", "dg", "分区", "4k对齐", "引导修复", "克隆"],
+                folder: "硬盘工具/DiskGenius",
+                entry: "DiskGenius.exe",
+                kind: "exe",
+                tag: "分区管理",
+                description: "国产全能磁盘分区管理、GPT/MBR 无损转换、系统迁移、扇区编辑与误删分区恢复神器。",
+                warning: "调整分区表、格式化或重建主引导记录前请务必核对目标物理磁盘并备份关键数据。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "ssdlife",
+                name: "SSDLife Pro",
+                aliases: &["ssdlife", "固态寿命", "磨损"],
+                folder: "硬盘工具/ssdlife",
+                entry: "ssdlife.exe",
+                kind: "exe",
+                tag: "寿命评估",
+                description: "固态硬盘健康度、闪存剩余寿命百分比与累计吞吐量快速评估工具。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "ssdz",
+                name: "SSD-Z",
+                aliases: &["ssdz", "ssd-z", "主控"],
+                folder: "硬盘工具/SSDZ",
+                entry: "SSDZ.exe",
+                kind: "exe",
+                tag: "主控/颗粒",
+                description: "类似 CPU-Z 风格的固态硬盘信息工具，用于查询主控、闪存制程与 TRIM 状态。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
                 id: "h2testw",
                 name: "H2testw (U盘扩容校验)",
                 aliases: &["h2testw", "u盘校验", "扩容盘"],
@@ -527,6 +701,42 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 is_tui: false,
             },
             ToolSpec {
+                id: "llftool",
+                name: "HDD LLF 低级格式化工具",
+                aliases: &["llftool", "低格", "低级格式化", "清零"],
+                folder: "硬盘工具/LLFTOOL",
+                entry: "LLFTOOL.exe",
+                kind: "exe",
+                tag: "高危低格",
+                description: "HDDGURU 底层扇区全盘清零与低级格式化工具，用于修复部分逻辑坏道或彻底销毁旧盘数据。",
+                warning: "极高危数据擦除工具！一旦开始将不可逆地彻底抹除所选物理磁盘全部扇区与分区，切勿选错系统盘或数据盘！",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "finaldata",
+                name: "FinalData 数据恢复",
+                aliases: &["finaldata", "数据恢复", "误删恢复"],
+                folder: "硬盘工具/finaldata",
+                entry: "FINALDATA.exe",
+                kind: "exe",
+                tag: "数据恢复",
+                description: "经典深度文件数据恢复软件，支持扫描误删除文件或损坏文件系统中的数据。",
+                warning: "恢复数据时请将扫描出的文件保存到其他物理硬盘，切勿直接写回原故障分区以免覆盖源数据。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "mofang_recovery",
+                name: "魔方数据恢复",
+                aliases: &["魔方数据恢复", "恢复误删"],
+                folder: "硬盘工具/魔方数据恢复",
+                entry: "魔方数据恢复.exe",
+                kind: "exe",
+                tag: "轻量恢复",
+                description: "单文件轻量级误删文件快速扫描与恢复小工具。",
+                warning: "请将恢复出的文件导出到非原盘的其他分区，避免二次写入覆盖。",
+                is_tui: false,
+            },
+            ToolSpec {
                 id: "spacesniffer",
                 name: "SpaceSniffer 空间透视",
                 aliases: &["spacesniffer", "磁盘空间", "大文件"],
@@ -559,18 +769,6 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 kind: "exe",
                 tag: "机械整理",
                 description: "机械硬盘（HDD）文件与空闲空间碎片整理工具（固态硬盘无需整理碎片）。",
-                warning: "",
-                is_tui: false,
-            },
-            ToolSpec {
-                id: "ssdz",
-                name: "SSD-Z",
-                aliases: &["ssdz", "ssd-z", "主控"],
-                folder: "硬盘工具/SSDZ",
-                entry: "SSDZ.exe",
-                kind: "exe",
-                tag: "主控/颗粒",
-                description: "类似 CPU-Z 风格的固态硬盘信息工具，用于查询主控、闪存制程与 TRIM 状态。",
                 warning: "",
                 is_tui: false,
             },
@@ -615,6 +813,49 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 tag: "网页测试",
                 description: "调用浏览器打开在线屏幕测试页面，检查坏点、对比度、灰度渐变与拖影。",
                 warning: "",
+                is_tui: false,
+            },
+        ],
+    },
+    CategoryDef {
+        id: "burn",
+        name: "烤机工具",
+        folder: "烤鸡工具",
+        specs: &[
+            ToolSpec {
+                id: "furmark_bat",
+                name: "FurMark 一键720P烤机",
+                aliases: &["furmark", "甜甜圈", "一键烤机", "显卡烤机", "720p"],
+                folder: "烤鸡工具/FurMark",
+                entry: "start.bat",
+                kind: "bat",
+                tag: "一键烤机",
+                description: "通过批处理安全提示后一键以 1280×720 窗口模式启动 FurMark 满载烤机，快速检验显卡散热与供电稳定性。",
+                warning: "显卡满载功耗与发热量极高，运行前请确认显卡风扇运转正常及电源余量充足。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "furmark_gui",
+                name: "FurMark 甜甜圈 (完整版)",
+                aliases: &["furmark", "甜甜圈", "gpu shark", "分辨率", "抗锯齿"],
+                folder: "烤鸡工具/FurMark",
+                entry: "FurMark.exe",
+                kind: "exe",
+                tag: "显卡满载",
+                description: "经典“甜甜圈”显卡 OpenGL 极限压力测试图形界面版，支持自定义分辨率、MSAA 抗锯齿、高温警报与 Benchmark 跑分。",
+                warning: "高负载显卡烤机工具，建议配合 GPU-Z 或 HWiNFO 同步监测核心温度与热点（Hot Spot）温度。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "furmark_cpuburner",
+                name: "FurMark CPU Burner",
+                aliases: &["cpuburner", "双烤", "cpu烤机"],
+                folder: "烤鸡工具/FurMark",
+                entry: "cpuburner.exe",
+                kind: "exe",
+                tag: "多线程烧机",
+                description: "FurMark 附带的极简多线程 CPU 满载发热器，常与甜甜圈同时开启用于整机电源/散热“双烤”压测。",
+                warning: "与显卡同时双烤时整机功耗将达到峰值，请留意 CPU 温度及电源负载。",
                 is_tui: false,
             },
         ],
@@ -712,6 +953,66 @@ const CATEGORY_DEFS: &[CategoryDef] = &[
                 kind: "exe",
                 tag: "增强进程",
                 description: "微软 Sysinternals 出品的高级任务管理器，可查看进程树、句柄锁占用、DLL 与 GPU 占用。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "coretemp",
+                name: "Core Temp 核心温度",
+                aliases: &["coretemp", "core temp", "cpu温度", "任务栏温度"],
+                folder: "其他工具/CoreTemp",
+                entry: "Core Temp x64.exe",
+                kind: "exe",
+                tag: "轻量测温",
+                description: "极轻量的处理器各物理核心实时温度、TjMax 距离、频率与功耗监控小工具（支持任务栏托盘常驻显示）。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "everything",
+                name: "Everything 极速文件搜索",
+                aliases: &["everything", "文件搜索", "查找文件"],
+                folder: "其他工具/Everything",
+                entry: "Everything.exe",
+                kind: "exe",
+                tag: "秒级搜索",
+                description: "基于 NTFS USN 日志索引的毫秒级全盘文件名搜索神器。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "geek",
+                name: "Geek Uninstaller 强力卸载",
+                aliases: &["geek", "uninstaller", "卸载", "残留清理"],
+                folder: "其他工具/Geek Uninstaller",
+                entry: "Geek Uninstaller.exe",
+                kind: "exe",
+                tag: "无残留卸载",
+                description: "单文件软件卸载与强制清除工具，卸载后自动深度扫描并清理遗留注册表项与残余文件夹。",
+                warning: "",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "dismpp",
+                name: "Dism++ 系统精简与维护",
+                aliases: &["dism++", "dismpp", "垃圾清理", "系统优化", "驱动导出", "更新管理"],
+                folder: "其他工具/Dism++",
+                entry: "Dism++x64.exe",
+                kind: "exe",
+                tag: "系统瑞士刀",
+                description: "Windows 系统维护瑞士军刀：支持 WinSxS 组件安全清理、驱动备份还原、启动项管理、系统优化与 ESD/WIM 镜像转换。",
+                warning: "清理系统更新备份或调整深度系统服务前请仔细阅读条目提示，避免误删需要的回滚组件。",
+                is_tui: false,
+            },
+            ToolSpec {
+                id: "ultraiso",
+                name: "UltraISO 软碟通",
+                aliases: &["ultraiso", "软碟通", "光盘镜像", "iso编辑"],
+                folder: "其他工具/ULTRAISO",
+                entry: "ULTRAISO.exe",
+                kind: "exe",
+                tag: "镜像编辑",
+                description: "经典光盘映像 ISO 文件提取、编辑、制作与写入硬盘映像（U 盘启动盘）工具。",
                 warning: "",
                 is_tui: false,
             },
@@ -908,6 +1209,7 @@ pub fn load_from_static_file(root: &Path) -> io::Result<Catalog> {
                     }
                 }
             }
+            crate::tool_guides::fill_missing_guide(t);
         }
     }
     cat.rebuild_indices();
@@ -954,7 +1256,7 @@ pub fn scan_and_build(root: &Path) -> io::Result<Catalog> {
 
         for spec in cdef.specs {
             if spec.is_tui {
-                cat_tools.push(Tool {
+                let mut tool = Tool {
                     id: spec.id.to_string(),
                     name: spec.name.to_string(),
                     aliases: spec.aliases.iter().map(|s| (*s).to_string()).collect(),
@@ -966,7 +1268,9 @@ pub fn scan_and_build(root: &Path) -> io::Result<Catalog> {
                     kind: "tui".to_string(),
                     rel_dir: "内置 TUI 模块".to_string(),
                     ..Default::default()
-                });
+                };
+                crate::tool_guides::fill_missing_guide(&mut tool);
+                cat_tools.push(tool);
                 continue;
             }
 
@@ -1236,7 +1540,7 @@ fn build_tool_from_dir(
         String::new()
     };
 
-    Some(Tool {
+    let mut tool = Tool {
         id: id.to_string(),
         name: name.to_string(),
         aliases: aliases.iter().map(|s| (*s).to_string()).collect(),
@@ -1252,10 +1556,15 @@ fn build_tool_from_dir(
         rel_entry_path,
         variants,
         password_note: pw_note,
+        scenarios: Vec::new(),
+        usage_steps: Vec::new(),
+        key_tips: Vec::new(),
         files,
         total_bytes,
         file_count,
-    })
+    };
+    crate::tool_guides::fill_missing_guide(&mut tool);
+    Some(tool)
 }
 
 fn classify_ext(ext: &str) -> Option<&'static str> {
@@ -1332,8 +1641,26 @@ mod tests {
         let root = workspace_root();
         assert!(root.join("tools").is_dir(), "tools directory missing");
 
+        for act_dir in [
+            "MicroKMS神龙版",
+            "oem7",
+            "Windows10数字权力激活",
+            "三星win7激活工具",
+            "其他win7激活工具",
+            "图拉丁KMS",
+        ] {
+            assert!(
+                !root.join("tools").join("其他工具").join(act_dir).exists(),
+                "Windows activation folder should not exist: {act_dir}"
+            );
+        }
+
         let cat = load(&root).expect("load catalog");
-        assert_eq!(cat.categories.len(), 8, "expected 8 non-empty categories");
+        assert_eq!(cat.categories.len(), 9, "expected 9 non-empty categories");
+        assert!(
+            cat.categories.iter().all(|c| c.id != "common"),
+            "redundant common category should be absent"
+        );
         for c in &cat.categories {
             assert!(!c.tools.is_empty(), "empty category {}", c.name);
         }
@@ -1343,43 +1670,74 @@ mod tests {
             "gamepp",
             "iva",
             "check_update",
-            "aida64",
-            "cpuz",
-            "gpuz",
             "tulading_kms",
             "win10_act",
             "microkms",
             "oem7",
             "samsung_win7",
             "other_win7",
-            "ultraiso",
-            "memtestpro",
-            "dismpp",
-            "diskgenius",
-            "furmark_bat",
-            "hwmonitor",
         ] {
             assert!(cat.get(forbidden).is_none(), "removed/stub {forbidden} should be absent");
         }
 
+        assert_eq!(cat.total_tools(), 72, "got {} tools", cat.total_tools());
         assert!(
-            cat.total_tools() >= 48 && cat.total_tools() <= 49,
-            "got {} tools",
-            cat.total_tools()
+            cat.iter_tools().all(|t| !t.id.starts_with("dyn_")),
+            "unexpected dynamic fallback tool detected"
         );
 
         for tool in cat.iter_tools() {
+            assert!(!tool.scenarios.is_empty(), "missing scenarios for {}", tool.id);
+            assert!(!tool.usage_steps.is_empty(), "missing usage_steps for {}", tool.id);
+            assert!(!tool.key_tips.is_empty(), "missing key_tips for {}", tool.id);
+            assert!(
+                crate::tool_guides::lookup_builtin_guide(&tool.id).is_some(),
+                "missing builtin guide entry for {}",
+                tool.id
+            );
             if tool.kind == "tui" {
                 continue;
             }
             assert!(tool.entry_path.is_file(), "missing entry_path for {}: {:?}", tool.id, tool.entry_path);
         }
 
-        for id in ["tulading_hw", "rweverything", "thread_bomb", "mem_clean", "batteryinfoview", "chipgenius"] {
-            assert!(cat.get(id).is_some(), "restored medium-risk tool {id} missing");
+        for id in [
+            "tulading_hw",
+            "rweverything",
+            "thread_bomb",
+            "mem_clean",
+            "batteryinfoview",
+            "chipgenius",
+            "aida64",
+            "hwinfo",
+            "occt",
+            "speccy",
+            "hwmonitor",
+            "cpuz",
+            "gpuz",
+            "thaiphoon",
+            "memtestpro",
+            "ramdisk",
+            "memtest",
+            "furmark_bat",
+            "furmark_gui",
+            "furmark_cpuburner",
+            "diskgenius",
+            "hdtune",
+            "llftool",
+            "ssdlife",
+            "finaldata",
+            "mofang_recovery",
+            "coretemp",
+            "dismpp",
+            "everything",
+            "geek",
+            "ultraiso",
+        ] {
+            assert!(cat.get(id).is_some(), "expected tool {id} missing");
         }
 
-        for id in ["batteryinfoview", "chipgenius", "mem_clean", "thread_bomb"] {
+        for id in ["batteryinfoview", "chipgenius", "mem_clean", "memtestpro", "thread_bomb"] {
             let tool = cat.get(id).unwrap_or_else(|| panic!("missing tool {id}"));
             assert!(!tool.password_note.is_empty(), "empty password_note for {id}");
             assert!(!tool.password_note.contains('\u{FFFD}'), "garbled password for {id}");
@@ -1389,5 +1747,43 @@ mod tests {
         let cdi = cat.get("crystaldiskinfo").expect("crystaldiskinfo missing");
         assert!(cdi.match_query("crystaldiskinfo"));
         assert!(cdi.match_query("硬盘"));
+    }
+
+    #[test]
+    fn static_catalog_guide_overrides_builtin() {
+        let dir = std::env::temp_dir().join(format!("tb_guide_override_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+
+        let custom_json = r#"{
+  "categories": [
+    {
+      "ID": "cpu",
+      "Name": "CPU工具",
+      "Folder": "处理器工具",
+      "Tools": [
+        {
+          "id": "cpuz",
+          "name": "CPU-Z",
+          "category_id": "cpu",
+          "category_name": "CPU工具",
+          "kind": "exe",
+          "rel_dir": "tools/处理器工具/CPUZ",
+          "rel_entry_path": "tools/处理器工具/CPUZ/cpuz64.exe",
+          "usage_steps": ["自定义步骤一", "自定义步骤二"]
+        }
+      ]
+    }
+  ]
+}"#;
+        fs::write(dir.join(STATIC_CATALOG_FILE_NAME), custom_json.as_bytes()).unwrap();
+
+        let loaded = load_from_static_file(&dir).expect("load custom static catalog");
+        let cpuz = loaded.get("cpuz").expect("cpuz present");
+        assert_eq!(cpuz.usage_steps, vec!["自定义步骤一", "自定义步骤二"]);
+        assert!(!cpuz.scenarios.is_empty());
+        assert!(!cpuz.key_tips.is_empty());
+
+        let _ = fs::remove_dir_all(&dir);
     }
 }

@@ -46,44 +46,87 @@ impl Rgb {
     }
 }
 
-pub mod theme {
-    use super::Rgb;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ThemePalette {
+    pub canvas_bg: Rgb,
+    pub surface_bg: Rgb,
+    pub detail_bg: Rgb,
+    pub card_bg: Rgb,
+    pub card_hover: Rgb,
+    pub card_selected: Rgb,
+    pub card_selected_unfocused: Rgb,
+    pub pill_bg: Rgb,
+    pub keycap_bg: Rgb,
 
-    pub const CANVAS_BG: Rgb = Rgb::hex(0xF4F6F9);
-    pub const SURFACE_BG: Rgb = Rgb::hex(0xFFFFFF);
-    pub const CARD_BG: Rgb = Rgb::hex(0xF8FAFC);
-    pub const CARD_HOVER: Rgb = Rgb::hex(0xF1F5F9);
-    pub const CARD_SELECTED: Rgb = Rgb::hex(0xEFF6FF);
-    pub const PILL_BG: Rgb = Rgb::hex(0xF1F5F9);
-    pub const KEYCAP_BG: Rgb = Rgb::hex(0xF8FAFC);
+    pub border_dim: Rgb,
+    pub border_subtle: Rgb,
+    pub border_active: Rgb,
+    pub border_soft_sel: Rgb,
 
-    pub const BORDER_DIM: Rgb = Rgb::hex(0xE2E8F0);
-    pub const BORDER_SUBTLE: Rgb = Rgb::hex(0xF1F5F9);
-    pub const BORDER_ACTIVE: Rgb = Rgb::hex(0x2563EB);
-    pub const BORDER_SOFT_SEL: Rgb = Rgb::hex(0xBFDBFE);
-    pub const ACCENT: Rgb = Rgb::hex(0x2563EB);
-    pub const ACCENT_DARK: Rgb = Rgb::hex(0x1D4ED8);
-    pub const ACCENT_SOFT: Rgb = Rgb::hex(0xDBEAFE);
-    pub const ACCENT_LIGHT: Rgb = Rgb::hex(0x93C5FD);
+    pub accent: Rgb,
+    pub accent_dark: Rgb,
+    pub accent_soft: Rgb,
 
-    pub const TEXT_PRIMARY: Rgb = Rgb::hex(0x0F172A);
-    pub const TEXT_SECONDARY: Rgb = Rgb::hex(0x475569);
-    pub const TEXT_MUTED: Rgb = Rgb::hex(0x94A3B8);
-    pub const TEXT_WHITE: Rgb = Rgb::hex(0xFFFFFF);
-    pub const TEXT_SLATE: Rgb = Rgb::hex(0x374151);
+    pub text_primary: Rgb,
+    pub text_secondary: Rgb,
+    pub text_muted: Rgb,
+    pub text_white: Rgb,
+    pub text_slate: Rgb,
 
-    pub const GREEN_FG: Rgb = Rgb::hex(0x059669);
-    pub const GREEN_BG: Rgb = Rgb::hex(0xECFDF5);
-    pub const AMBER_FG: Rgb = Rgb::hex(0xB45309);
-    pub const AMBER_BG: Rgb = Rgb::hex(0xFFFBEB);
-    pub const AMBER_BORDER: Rgb = Rgb::hex(0xFCD34D);
-    pub const RED_FG: Rgb = Rgb::hex(0xDC2626);
-    pub const RED_BG: Rgb = Rgb::hex(0xFEF2F2);
-    pub const PURPLE_FG: Rgb = Rgb::hex(0x7C3AED);
-    pub const DIM_BACKDROP: Rgb = Rgb::hex(0x0F172A);
-    pub const SCROLL_THUMB: Rgb = Rgb::hex(0xCBD5E1);
-    pub const SCROLL_THUMB_HOVER: Rgb = Rgb::hex(0x94A3B8);
+    pub green_fg: Rgb,
+    pub green_bg: Rgb,
+    pub green_border: Rgb,
+    pub amber_fg: Rgb,
+    pub amber_bg: Rgb,
+    pub amber_border: Rgb,
+    pub red_fg: Rgb,
+    pub red_bg: Rgb,
+    pub red_border: Rgb,
+    pub dim_backdrop: Rgb,
+    pub scroll_thumb: Rgb,
+    pub scroll_thumb_hover: Rgb,
 }
+
+/// Single cohesive "Warm Paper · Pure Charcoal Ink" palette.
+pub const THEME: ThemePalette = ThemePalette {
+    canvas_bg: Rgb::hex(0xF3F1EB),
+    surface_bg: Rgb::hex(0xFCFBF8),
+    detail_bg: Rgb::hex(0xF8F7F3),
+    card_bg: Rgb::hex(0xF2EFE9),
+    card_hover: Rgb::hex(0xEAE7DF),
+    card_selected: Rgb::hex(0xEBE8E0),
+    card_selected_unfocused: Rgb::hex(0xF2F0EA),
+    pill_bg: Rgb::hex(0xEEECE5),
+    keycap_bg: Rgb::hex(0xFCFBF8),
+
+    border_dim: Rgb::hex(0xE3E0D8),
+    border_subtle: Rgb::hex(0xEFECE5),
+    border_active: Rgb::hex(0x2C2B28),
+    border_soft_sel: Rgb::hex(0xD4D0C6),
+
+    accent: Rgb::hex(0x1F1E1C),
+    accent_dark: Rgb::hex(0x121110),
+    accent_soft: Rgb::hex(0xE7E4DC),
+
+    text_primary: Rgb::hex(0x1A1917),
+    text_secondary: Rgb::hex(0x5E5B55),
+    text_muted: Rgb::hex(0x8E8A82),
+    text_white: Rgb::hex(0xFCFBF8),
+    text_slate: Rgb::hex(0x363430),
+
+    green_fg: Rgb::hex(0x2B7352),
+    green_bg: Rgb::hex(0xEAF3EE),
+    green_border: Rgb::hex(0xBBDCC9),
+    amber_fg: Rgb::hex(0x9A5B13),
+    amber_bg: Rgb::hex(0xFBF4E6),
+    amber_border: Rgb::hex(0xE6CCA0),
+    red_fg: Rgb::hex(0xB44036),
+    red_bg: Rgb::hex(0xFAEEEC),
+    red_border: Rgb::hex(0xE7BDB8),
+    dim_backdrop: Rgb::hex(0x181715),
+    scroll_thumb: Rgb::hex(0xD5D1C8),
+    scroll_thumb_hover: Rgb::hex(0xABA69C),
+};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Rect {
@@ -428,11 +471,8 @@ pub struct FontCache {
     pub reg_12: HFONT,
     pub bold_11: HFONT,
     pub reg_11: HFONT,
-    pub bold_10: HFONT,
-    pub reg_10: HFONT,
     pub mono_11: HFONT,
     pub mono_11b: HFONT,
-    pub mono_105b: HFONT,
 }
 
 impl Default for FontCache {
@@ -448,11 +488,8 @@ impl Default for FontCache {
             reg_12: null_mut(),
             bold_11: null_mut(),
             reg_11: null_mut(),
-            bold_10: null_mut(),
-            reg_10: null_mut(),
             mono_11: null_mut(),
             mono_11b: null_mut(),
-            mono_105b: null_mut(),
         }
     }
 }
@@ -497,11 +534,8 @@ impl FontCache {
             &mut self.reg_12,
             &mut self.bold_11,
             &mut self.reg_11,
-            &mut self.bold_10,
-            &mut self.reg_10,
             &mut self.mono_11,
             &mut self.mono_11b,
-            &mut self.mono_105b,
         ];
         unsafe {
             for h in handles {
@@ -522,24 +556,21 @@ impl FontCache {
         self.clear();
         self.dpi = dpi;
         let sc = |logical_px: f32| -> i32 {
-            ((logical_px * (dpi as f32 / 96.0) * 1.15).round() as i32).max(10)
+            ((logical_px * (dpi as f32 / 96.0)).round() as i32).max(10)
         };
         let ui = "Microsoft YaHei UI";
         let mono = "Consolas";
-        self.hero_16b = create_cleartype_font(ui, sc(16.0), FW_BOLD);
-        self.title_14b = create_cleartype_font(ui, sc(14.0), FW_BOLD);
-        self.bold_13 = create_cleartype_font(ui, sc(13.0), FW_BOLD);
-        self.semi_125 = create_cleartype_font(ui, sc(12.5), FW_SEMIBOLD);
-        self.reg_125 = create_cleartype_font(ui, sc(12.5), FW_NORMAL);
-        self.bold_12 = create_cleartype_font(ui, sc(12.0), FW_BOLD);
-        self.reg_12 = create_cleartype_font(ui, sc(12.0), FW_NORMAL);
-        self.bold_11 = create_cleartype_font(ui, sc(11.0), FW_BOLD);
-        self.reg_11 = create_cleartype_font(ui, sc(11.0), FW_NORMAL);
-        self.bold_10 = create_cleartype_font(ui, sc(10.0), FW_BOLD);
-        self.reg_10 = create_cleartype_font(ui, sc(10.0), FW_NORMAL);
-        self.mono_11 = create_cleartype_font(mono, sc(11.0), FW_NORMAL);
-        self.mono_11b = create_cleartype_font(mono, sc(11.0), FW_BOLD);
-        self.mono_105b = create_cleartype_font(mono, sc(10.5), FW_BOLD);
+        self.hero_16b = create_cleartype_font(ui, sc(17.0), FW_BOLD);
+        self.title_14b = create_cleartype_font(ui, sc(15.0), FW_BOLD);
+        self.bold_13 = create_cleartype_font(ui, sc(13.5), FW_BOLD);
+        self.semi_125 = create_cleartype_font(ui, sc(13.0), FW_SEMIBOLD);
+        self.reg_125 = create_cleartype_font(ui, sc(13.0), FW_NORMAL);
+        self.bold_12 = create_cleartype_font(ui, sc(12.5), FW_BOLD);
+        self.reg_12 = create_cleartype_font(ui, sc(12.5), FW_NORMAL);
+        self.bold_11 = create_cleartype_font(ui, sc(11.5), FW_BOLD);
+        self.reg_11 = create_cleartype_font(ui, sc(11.5), FW_NORMAL);
+        self.mono_11 = create_cleartype_font(mono, sc(11.5), FW_NORMAL);
+        self.mono_11b = create_cleartype_font(mono, sc(11.5), FW_BOLD);
     }
 }
 
@@ -584,10 +615,16 @@ pub struct Canvas<'a> {
     clip_stack: Vec<(Rect, i32)>,
     gdi_dirty: bool,
     pub fonts: &'a FontCache,
+    pub theme: &'static ThemePalette,
 }
 
 impl<'a> Canvas<'a> {
-    pub fn new(bb: &'a mut BackBuffer, fonts: &'a FontCache, dpi: u32) -> Self {
+    pub fn new(
+        bb: &'a mut BackBuffer,
+        fonts: &'a FontCache,
+        dpi: u32,
+        theme: &'static ThemePalette,
+    ) -> Self {
         let w = bb.width;
         let h = bb.height;
         let hdc = bb.hdc;
@@ -603,6 +640,7 @@ impl<'a> Canvas<'a> {
             clip_stack: Vec::with_capacity(8),
             gdi_dirty: false,
             fonts,
+            theme,
         }
     }
 
@@ -901,14 +939,15 @@ impl<'a> Canvas<'a> {
         if r.is_empty() {
             return;
         }
+        let t = self.theme;
         let rad = (r.w.min(r.h) as f32) * 0.25;
         let (bg, border, fg, ico) = match kind {
-            "bat" => (theme::AMBER_BG, theme::AMBER_BORDER, theme::AMBER_FG, "terminal"),
-            "archive" => (theme::AMBER_BG, theme::AMBER_BORDER, theme::AMBER_FG, "lock"),
-            "img" => (theme::CARD_SELECTED, theme::BORDER_SOFT_SEL, theme::ACCENT, "panel"),
-            "tui" => (theme::GREEN_BG, Rgb::hex(0xA7F3D0), theme::GREEN_FG, "screen"),
-            "html" => (theme::CARD_SELECTED, theme::BORDER_SOFT_SEL, theme::ACCENT, "web"),
-            _ => (theme::PILL_BG, theme::BORDER_DIM, theme::TEXT_SECONDARY, "wrench"),
+            "bat" => (t.amber_bg, t.amber_border, t.amber_fg, "terminal"),
+            "archive" => (t.amber_bg, t.amber_border, t.amber_fg, "lock"),
+            "img" => (t.card_selected, t.border_soft_sel, t.accent, "panel"),
+            "tui" => (t.green_bg, t.green_border, t.green_fg, "screen"),
+            "html" => (t.card_selected, t.border_soft_sel, t.accent, "web"),
+            _ => (t.pill_bg, t.border_dim, t.text_secondary, "wrench"),
         };
         self.fill_round_rect(r, rad, Some(bg), 1.0, border);
         let pad = (r.w.min(r.h) / 5).max(3);
@@ -1095,6 +1134,23 @@ fn sdf_icon(key: &str, u: f32, v: f32) -> f32 {
             let base = sd_seg(u, v, 0.32, 0.82, 0.68, 0.82, 0.045);
             frame.min(stem).min(base)
         }
+        "burn" => {
+            let base = sd_circle(u, v, 0.5, 0.60, 0.24);
+            let mid = sd_circle(u, v, 0.5, 0.45, 0.13);
+            let l_tip = sd_seg(u, v, 0.31, 0.54, 0.50, 0.16, 0.06);
+            let r_tip = sd_seg(u, v, 0.69, 0.54, 0.50, 0.16, 0.06);
+            let outer = base.min(mid).min(l_tip).min(r_tip);
+            let inner_core = sd_circle(u, v, 0.5, 0.63, 0.10)
+                .min(sd_seg(u, v, 0.5, 0.63, 0.5, 0.44, 0.04));
+            outer.max(-inner_core)
+        }
+        "mobo" => {
+            let board = sd_stroke_box(u, v, 0.5, 0.5, 0.34, 0.34, 0.05);
+            let socket = sd_round_box(u, v, 0.40, 0.38, 0.11, 0.11, 0.02);
+            let pcie = sd_seg(u, v, 0.30, 0.64, 0.70, 0.64, 0.04);
+            let dimm = sd_seg(u, v, 0.64, 0.30, 0.64, 0.50, 0.04);
+            board.min(socket).min(pcie).min(dimm)
+        }
         "periph" => {
             let mouse = sd_round_box(u, v, 0.5, 0.5, 0.23, 0.35, 0.20);
             let hollow = sd_round_box(u, v, 0.5, 0.5, 0.14, 0.26, 0.13);
@@ -1103,7 +1159,7 @@ fn sdf_icon(key: &str, u: f32, v: f32) -> f32 {
             let line = sd_seg(u, v, 0.32, 0.48, 0.68, 0.48, 0.035);
             shell.min(wheel).min(line)
         }
-        "other" | "common" => {
+        "other" => {
             let box_out = sd_stroke_box(u, v, 0.5, 0.5, 0.32, 0.32, 0.05);
             let plus_h = sd_seg(u, v, 0.34, 0.5, 0.66, 0.5, 0.045);
             let plus_v = sd_seg(u, v, 0.5, 0.34, 0.5, 0.66, 0.045);
@@ -1207,5 +1263,22 @@ fn sdf_icon(key: &str, u: f32, v: f32) -> f32 {
             outer.min(h).min(v_line)
         }
         _ => sd_round_box(u, v, 0.5, 0.5, 0.28, 0.28, 0.06),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn luma(c: Rgb) -> u32 {
+        c.r as u32 * 299 + c.g as u32 * 587 + c.b as u32 * 114
+    }
+
+    #[test]
+    fn warm_paper_ink_surface_hierarchy() {
+        assert!(luma(THEME.surface_bg) > luma(THEME.detail_bg));
+        assert!(luma(THEME.detail_bg) > luma(THEME.canvas_bg));
+        assert!(luma(THEME.accent) < 40_000);
+        assert!(luma(THEME.text_white) > 240_000);
     }
 }

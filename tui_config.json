@@ -1,16 +1,12 @@
 {
-  "show_footer": false,
   "show_preview": true,
-  "sort_mode": "name",
+  "sort_mode": "default",
   "pinned": [
     "crystaldiskinfo",
     "crystaldiskmark",
     "prime95_bat",
-    "rufus"
+    "rufus",
+    "tui_screen_test"
   ],
-  "recent": [
-    "online_screen_test",
-    "tui_screen_test",
-    "procexp"
-  ]
+  "recent": []
 }

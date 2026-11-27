@@ -182,4 +182,22 @@ mod tests {
 
         let _ = fs::remove_dir_all(&dir);
     }
+
+    #[test]
+    fn ignores_legacy_theme_field() {
+        let dir = std::env::temp_dir().join(format!("tb_legacy_cfg_test_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+
+        fs::write(
+            dir.join(CONFIG_FILE_NAME),
+            br#"{"show_preview":true,"sort_mode":"name","theme":"prussian"}"#,
+        )
+        .unwrap();
+        let loaded = Config::load(&dir);
+        assert!(loaded.show_preview);
+        assert_eq!(loaded.sort_mode, "name");
+
+        let _ = fs::remove_dir_all(&dir);
+    }
 }

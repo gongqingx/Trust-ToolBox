@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use std::os::windows::process::CommandExt;
@@ -159,6 +159,19 @@ impl ProcessTracker {
     pub fn has_running(&self) -> bool {
         let guard = self.state.lock().unwrap();
         guard.items.iter().any(|it| it.running && it.pid > 0)
+    }
+
+    pub fn running_summary(&self) -> (usize, HashSet<String>) {
+        let guard = self.state.lock().unwrap();
+        let mut count = 0usize;
+        let mut ids = HashSet::new();
+        for it in &guard.items {
+            if it.running && it.pid > 0 {
+                count += 1;
+                ids.insert(it.tool_id.clone());
+            }
+        }
+        (count, ids)
     }
 
     pub fn refresh(&self) {

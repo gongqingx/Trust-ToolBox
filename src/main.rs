@@ -8,6 +8,7 @@ mod gdi;
 mod hwinfo;
 mod icons;
 mod launcher;
+mod tool_guides;
 mod ui_render;
 
 use app_state::{
@@ -16,7 +17,7 @@ use app_state::{
 use config::Config;
 use gdi::{BackBuffer, Canvas, FontCache, to_wide_null};
 use hwinfo::load_initial_hardware;
-use icons::synthesize_app_window_icon_rgba;
+use icons::synthesize_app_window_icon_rgba_sized;
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 use std::ptr::{null, null_mut};
@@ -43,14 +44,15 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
     CS_DBLCLKS, CS_HREDRAW, CS_VREDRAW, CreateIconIndirect, CreateWindowExW, DefWindowProcW,
     DestroyIcon, DestroyWindow, DispatchMessageW, GWL_EXSTYLE, GWL_STYLE, GetClientRect,
     GetMessageW, GetWindowLongW, GetWindowPlacement, HCURSOR, HICON, HTCLIENT,
-    ICON_BIG, ICON_SMALL, ICONINFO, IDC_ARROW, IDC_HAND, KillTimer, LoadCursorW, MINMAXINFO, MSG,
-    PostMessageW, PostQuitMessage, RegisterClassExW, SIZE_MINIMIZED, SPI_GETWORKAREA, SW_SHOW,
-    SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SendMessageW,
-    SetCursor, SetTimer, SetWindowLongW, SetWindowPlacement, SetWindowPos, ShowWindow,
-    SystemParametersInfoW, TranslateMessage, WINDOWPLACEMENT, WM_CLOSE, WM_CHAR, WM_DESTROY,
-    WM_DPICHANGED, WM_ERASEBKGND, WM_GETMINMAXINFO, WM_KEYDOWN, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN,
-    WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_PAINT, WM_PRINTCLIENT, WM_SETCURSOR, WM_SETICON,
-    WM_SIZE, WM_TIMER, WNDCLASSEXW, WS_EX_APPWINDOW, WS_OVERLAPPEDWINDOW, WS_POPUP, WS_VISIBLE,
+    ICON_BIG, ICON_SMALL, ICONINFO, IDC_ARROW, IDC_HAND, IMAGE_ICON, KillTimer, LR_DEFAULTCOLOR,
+    LR_DEFAULTSIZE, LR_SHARED, LoadCursorW, LoadImageW, MINMAXINFO, MSG, PostMessageW, PostQuitMessage, RegisterClassExW,
+    SIZE_MINIMIZED, SPI_GETWORKAREA, SW_SHOW, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE,
+    SWP_NOSIZE, SWP_NOZORDER, SendMessageW, SetCursor, SetTimer, SetWindowLongW,
+    SetWindowPlacement, SetWindowPos, ShowWindow, SystemParametersInfoW, TranslateMessage,
+    WINDOWPLACEMENT, WM_CLOSE, WM_CHAR, WM_DESTROY, WM_DPICHANGED, WM_ERASEBKGND,
+    WM_GETMINMAXINFO, WM_KEYDOWN, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE,
+    WM_MOUSEWHEEL, WM_PAINT, WM_PRINTCLIENT, WM_SETCURSOR, WM_SETICON, WM_SIZE, WM_TIMER,
+    WNDCLASSEXW, WS_EX_APPWINDOW, WS_OVERLAPPEDWINDOW, WS_POPUP, WS_VISIBLE,
 };
 
 const WM_MOUSELEAVE: u32 = 0x02A3;
@@ -132,6 +134,62 @@ fn set_window_ime_enabled(hwnd: HWND, enabled: bool) {
     if let Some(f) = func {
         unsafe {
             let _ = f(hwnd, null_mut(), if enabled { IACE_DEFAULT } else { 0 });
+        }
+    }
+}
+
+type DwmSetWindowAttributeFn = unsafe extern "system" fn(
+    hwnd: HWND,
+    attribute: u32,
+    pv_attribute: *const core::ffi::c_void,
+    cb_attribute: u32,
+) -> i32;
+
+/// Syncs Windows 11/10 DWM caption background and text color with the active theme palette.
+fn sync_window_caption_theme(hwnd: HWND, theme: &gdi::ThemePalette) {
+    if hwnd.is_null() {
+        return;
+    }
+    static FN: OnceLock<Option<DwmSetWindowAttributeFn>> = OnceLock::new();
+    let func = *FN.get_or_init(|| unsafe {
+        let dll = to_wide_null("dwmapi.dll");
+        let mut hmod = GetModuleHandleW(dll.as_ptr());
+        if hmod.is_null() {
+            hmod = LoadLibraryW(dll.as_ptr());
+        }
+        if hmod.is_null() {
+            return None;
+        }
+        let proc_ptr: FARPROC =
+            GetProcAddress(hmod, c"DwmSetWindowAttribute".as_ptr() as *const u8);
+        proc_ptr.map(|f| core::mem::transmute_copy(&f))
+    });
+    if let Some(f) = func {
+        const DWMWA_USE_IMMERSIVE_DARK_MODE: u32 = 20;
+        const DWMWA_CAPTION_COLOR: u32 = 35;
+        const DWMWA_TEXT_COLOR: u32 = 36;
+        let dark: i32 = 0;
+        let caption = theme.canvas_bg.colorref();
+        let text = theme.text_primary.colorref();
+        unsafe {
+            let _ = f(
+                hwnd,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                &dark as *const i32 as *const _,
+                core::mem::size_of::<i32>() as u32,
+            );
+            let _ = f(
+                hwnd,
+                DWMWA_CAPTION_COLOR,
+                &caption as *const u32 as *const _,
+                core::mem::size_of::<u32>() as u32,
+            );
+            let _ = f(
+                hwnd,
+                DWMWA_TEXT_COLOR,
+                &text as *const u32 as *const _,
+                core::mem::size_of::<u32>() as u32,
+            );
         }
     }
 }
@@ -267,7 +325,7 @@ impl WinHost {
             return;
         }
         self.fonts.ensure_dpi(self.dpi);
-        let mut canvas = Canvas::new(&mut self.backbuffer, &self.fonts, self.dpi);
+        let mut canvas = Canvas::new(&mut self.backbuffer, &self.fonts, self.dpi, self.state.theme());
         ui_render::render_app(&mut canvas, &mut self.state, w, h);
     }
 
@@ -1150,6 +1208,23 @@ fn main() {
         let cursor_arrow = LoadCursorW(null_mut(), IDC_ARROW);
         let cursor_hand = LoadCursorW(null_mut(), IDC_HAND);
 
+        let class_icon_big = LoadImageW(
+            hinst,
+            1usize as *const u16,
+            IMAGE_ICON,
+            0,
+            0,
+            LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_SHARED,
+        ) as HICON;
+        let class_icon_sm = LoadImageW(
+            hinst,
+            1usize as *const u16,
+            IMAGE_ICON,
+            16,
+            16,
+            LR_DEFAULTCOLOR | LR_SHARED,
+        ) as HICON;
+
         let wc = WNDCLASSEXW {
             cbSize: core::mem::size_of::<WNDCLASSEXW>() as u32,
             style: CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
@@ -1157,12 +1232,12 @@ fn main() {
             cbClsExtra: 0,
             cbWndExtra: 0,
             hInstance: hinst,
-            hIcon: null_mut(),
+            hIcon: class_icon_big,
             hCursor: cursor_arrow,
             hbrBackground: null_mut(),
             lpszMenuName: null(),
             lpszClassName: class_name.as_ptr(),
-            hIconSm: null_mut(),
+            hIconSm: class_icon_sm,
         };
         RegisterClassExW(&wc);
 
@@ -1224,18 +1299,36 @@ fn main() {
         let cw = (cr.right - cr.left).max(1);
         let ch = (cr.bottom - cr.top).max(1);
 
-        let (iw, ih, irgba) = synthesize_app_window_icon_rgba();
-        let icon_big = create_hicon_from_rgba(iw, ih, &irgba);
-        let icon_small = create_hicon_from_rgba(iw, ih, &irgba);
+        let state = AppState::new(data_root, config_dir, cat, cfg, hw);
+        state.hwnd_raw.store(hwnd as isize, Ordering::Release);
+        sync_window_caption_theme(hwnd, state.theme());
+
+        let big_px = (48.0 * sf).round().max(32.0) as i32;
+        let small_px = (16.0 * sf).round().max(16.0) as i32;
+        let load_res_icon = |px: i32| -> HICON {
+            let h = LoadImageW(
+                hinst,
+                1usize as *const u16,
+                IMAGE_ICON,
+                px,
+                px,
+                LR_DEFAULTCOLOR,
+            ) as HICON;
+            if !h.is_null() {
+                h
+            } else {
+                let (iw, ih, irgba) = synthesize_app_window_icon_rgba_sized(px as u32);
+                create_hicon_from_rgba(iw, ih, &irgba)
+            }
+        };
+        let icon_big = load_res_icon(big_px);
+        let icon_small = load_res_icon(small_px);
         if !icon_big.is_null() {
             SendMessageW(hwnd, WM_SETICON, ICON_BIG as WPARAM, icon_big as LPARAM);
         }
         if !icon_small.is_null() {
             SendMessageW(hwnd, WM_SETICON, ICON_SMALL as WPARAM, icon_small as LPARAM);
         }
-
-        let state = AppState::new(data_root, config_dir, cat, cfg, hw);
-        state.hwnd_raw.store(hwnd as isize, Ordering::Release);
 
         let host = WinHost {
             hwnd,
